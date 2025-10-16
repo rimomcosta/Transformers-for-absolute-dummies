@@ -257,26 +257,6 @@ We'll build a complete transformer from scratch, small enough to compute by hand
 
 By the end, you'll understand every single operation in ChatGPT—just scaled up 1000×!
 
-### A Note on Math Notation
-
-We'll use some mathematical symbols throughout. Here's a quick reference (don't worry, we'll explain each when we use it):
-
-- **Bold letters** like $\mathbf{X}$ mean matrices or vectors (lists/tables of numbers)
-- **Subscripts** like $x_i$ mean "the i-th element"
-- **Superscripts** like $\mathbf{W}^Q$ mean "a specific version of W, in this case the Query weights"
-- **$\times$** means matrix multiplication (we'll show examples!)
-- **$\odot$** means element-wise multiplication (multiply matching positions)
-- **$\frac{\partial L}{\partial W}$** means "how much does loss L change when we change weight W" (calculus)
-- **$\sum$** means "sum up all these values"
-- **$\exp(x)$ or $e^x$** means the exponential function (2.718 raised to power x)
-- **$\log(x)$** means natural logarithm (inverse of exponential)
-- **$\sqrt{x}$** means square root
-- **$\mu$** (Greek letter mu) means average/mean
-- **$\sigma$** (Greek letter sigma) means standard deviation (how spread out values are)
-- **$\eta$** (Greek letter eta) means learning rate (step size)
-
-**Don't panic if this looks scary!** We'll calculate concrete examples for everything. You'll see that it's just arithmetic—addition, multiplication, and a bit of algebra.
-
 ---
 
 ## Chapter 0: The Grand Vision

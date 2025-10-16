@@ -177,7 +177,7 @@ Most guides only show inference (using a trained model). This tutorial covers:
 ### 4. Real Career Guidance
 Explains what you'll ACTUALLY do in industry:
 - You DON'T train GPT-4 from scratch ($100M+ budget required)
-- You DO fine-tune existing models ($100-$1000 budget)
+- You DO fine-tune existing models ($100-$1000 budget) or use techniques like ILWS (Instruction-Level Weight Shaping) for even more efficient adaptation
 - Understanding the difference is critical for career success!
 
 ### 5. Modern Content
@@ -262,6 +262,7 @@ Want to help with any of these? [Open an issue](../../issues) or submit a PR!
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762) - The original transformer paper (2017)
 - [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165) - The GPT-3 paper
 - [Training language models to follow instructions with human feedback](https://arxiv.org/abs/2203.02155) - InstructGPT/ChatGPT
+- [Instruction-Level Weight Shaping (ILWS)](https://arxiv.org/abs/2509.00251) - A framework for self-improving AI agents; more efficient alternative to fine-tuning (2025)
 
 ### Complementary Tutorials
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) - Visual explanation
