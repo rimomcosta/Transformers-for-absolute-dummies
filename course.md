@@ -1,6 +1,8 @@
 # Building a Transformer: The Complete Guide from Paper to Production
 
-**A Super-Friendly Tutorial for ML Engineers AND teens**
+**A Super-Friendly Tutorial for ML Engineers AND Teens**
+
+**Author:** Rimom Costa ([rimomcosta@gmail.com](mailto:rimomcosta@gmail.com))
 
 Hey there! 👋 Grab your pencil, paper, and maybe some crayons—we're building a transformer from absolute scratch, the same architecture powering ChatGPT and Claude. We'll use tiny numbers (6 dimensions instead of thousands) so you can calculate EVERYTHING by hand. No scary code, no giant computers—just you, me, and some really cool math.
 

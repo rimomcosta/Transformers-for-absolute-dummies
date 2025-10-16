@@ -2,9 +2,11 @@
 
 **Building a Transformer: The Complete Guide from Paper to Production**
 
-> *A Super-Friendly Tutorial for ML Engineers AND 10-Year-Olds*
+> *A Super-Friendly Tutorial for ML Engineers AND Teens*
 
-[![License: Custom](https://img.shields.io/badge/License-Custom-blue.svg)](#license)
+**Author:** [Rimom Costa](mailto:rimomcosta@gmail.com)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#license)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
@@ -296,6 +298,7 @@ Special thanks to everyone who has provided feedback, found bugs, or contributed
 
 ## Contact & Community
 
+- **Author:** Rimom Costa - [rimomcosta@gmail.com](mailto:rimomcosta@gmail.com)
 - **Issues:** Found a bug or have a suggestion? [Open an issue](../../issues)
 - **Discussions:** Questions or want to chat? [Start a discussion](../../discussions)
 
