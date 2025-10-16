@@ -16,7 +16,7 @@ This is **not** your typical AI tutorial. This is a complete, from-first-princip
 **What sets this apart:**
 
 - **Hand-calculable examples** - Uses tiny numbers (6 dimensions instead of 12,288) so you can verify EVERY calculation by hand
-- **Accessible to everyone** - Explains concepts for both 10-year-olds AND experienced ML engineers
+- **Accessible to everyone** - Explains concepts for both teens AND experienced ML engineers
 - **Complete coverage** - From tokenization to training to production ChatGPT (including RLHF)
 - **No magic boxes** - Every formula explained, every design choice justified
 - **Visual learning** - Analogies, examples, and intuitive explanations throughout
