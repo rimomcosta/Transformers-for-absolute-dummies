@@ -523,7 +523,16 @@ Before we continue, let's learn the mathematical tools we need:
 
 **Vector:** A list of numbers representing multiple properties
 - Row vector: $[1, 2, 3]$ — this could be 3 properties of something
-- Column vector: $\begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}$ — same information, different layout
+- Column vector : 
+
+$$
+\begin{bmatrix}
+1 \\
+2 \\
+3
+\end{bmatrix}
+$$
+
 
 **Why called "vector"?** In math/physics, a vector is something with multiple components (like velocity has speed + direction). Our word vectors have multiple meaning components!
 
@@ -533,12 +542,9 @@ $$\text{pizza} = [0.90, -0.10, -0.20, -0.80, 0.50, 0.75]$$
 This vector has 6 numbers, capturing 6 different learned properties of "pizza."
 
 **Matrix:** A table of vectors stacked together
-$$
-\mathbf{A} = \begin{bmatrix}
-1 & 2 & 3 \\
-4 & 5 & 6
-\end{bmatrix}
-$$
+```math
+\mathbf{A} = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}
+```
 This is a 2×3 matrix: 2 rows (could be 2 words), 3 columns (could be 3 dimensions per word)
 
 **Reading dimensions:** This matrix has:
@@ -586,12 +592,12 @@ $c_{22}$ (row 2 of A, column 2 of B):
 $$c_{22} = (4)(8) + (5)(10) + (6)(12) = 32 + 50 + 72 = 154$$
 
 **Final result:**
-$$
+```math
 \mathbf{C} = \begin{bmatrix}
 58 & 64 \\
 139 & 154
 \end{bmatrix}
-$$
+```
 
 **The pattern:** To get element at position (row i, column j), take the i-th row of the first matrix and j-th column of the second matrix, multiply corresponding elements, and sum them up.
 
@@ -2357,7 +2363,11 @@ These can be written as matrix operations! For offset $k$:
 
 $$\begin{bmatrix} \sin(\text{pos} + k) \\ \cos(\text{pos} + k) \end{bmatrix} = \begin{bmatrix} \cos(k) & \sin(k) \\ -\sin(k) & \cos(k) \end{bmatrix} \begin{bmatrix} \sin(\text{pos}) \\ \cos(\text{pos}) \end{bmatrix}$$
 
-The matrix $\begin{bmatrix} \cos(k) & \sin(k) \\ -\sin(k) & \cos(k) \end{bmatrix}$ is the rotation matrix for offset $k$!
+The matrix 
+```math
+\begin{bmatrix} \cos(k) & \sin(k) \\ -\sin(k) & \cos(k) \end{bmatrix}
+```
+is the rotation matrix for offset $k$!
 
 **The practical implication:** The attention mechanism (which uses matrix multiplications) can easily learn: "When comparing word A at position $p$ with word B at position $p+3$, I should look for pattern X." The "+3" relationship is expressible as a matrix operation the model can learn!
 
@@ -2826,7 +2836,7 @@ We multiply each word's embedding (first 3 dims only for Head 1) by these weight
 **For "I" $[0.01, 0.80, 0.30]$:**
 
 Query calculation:
-$$
+```math
 \begin{align}
 \mathbf{Q}_I &= [0.01, 0.80, 0.30] \times \mathbf{W}^Q_1 \\
 &= \begin{bmatrix}
@@ -2841,25 +2851,25 @@ $$
 \end{bmatrix}^T \\
 &= [-0.008, -0.127, 0.379]
 \end{align}
-$$
+```
 
 Key calculation:
-$$
+```math
 \begin{align}
 \mathbf{K}_I &= [0.01, 0.80, 0.30] \times \mathbf{W}^K_1 \\
 &= [0.001 + 0.16 + 0.12, -0.002 + 0.24 + 0.03, 0.003 - 0.08 + 0.06] \\
 &= [0.281, 0.268, -0.017]
 \end{align}
-$$
+```
 
 Value calculation:
-$$
+```math
 \begin{align}
 \mathbf{K}_I &= [0.01, 0.80, 0.30] \times \mathbf{W}^V_1 \\
 &= [0.003 - 0.16 + 0.03, 0.001 + 0.24 - 0.03, 0.002 + 0.08 + 0.09] \\
 &= [-0.127, 0.211, 0.172]
 \end{align}
-$$
+```
 
 **For "love" $[0.44, 1.14, 0.05]$:**
 
@@ -2928,40 +2938,40 @@ For vectors $\mathbf{a} = [a_1, a_2, a_3]$ and $\mathbf{b} = [b_1, b_2, b_3]$:
 $$\mathbf{a} \cdot \mathbf{b} = a_1 \times b_1 + a_2 \times b_2 + a_3 \times b_3$$
 
 **Simple example:**
-$$
+```math
 \begin{align}
 [2, 3, 1] \cdot [4, 1, 2] &= (2)(4) + (3)(1) + (1)(2) \\
 &= 8 + 3 + 2 \\
 &= 13
 \end{align}
-$$
+```
 
 **Another example showing similarity:**
-$$
+```math
 \begin{align}
 [1, 2, 3] \cdot [1, 2, 3] &= (1)(1) + (2)(2) + (3)(3) \\
 &= 1 + 4 + 9 \\
 &= 14 \quad \text{← Identical vectors = high score!}
 \end{align}
-$$
+```
 
 **Opposite vectors:**
-$$
+```math
 \begin{align}
 [1, 2, 3] \cdot [-1, -2, -3] &= (1)(-1) + (2)(-2) + (3)(-3) \\
 &= -1 - 4 - 9 \\
 &= -14 \quad \text{← Opposite vectors = negative score!}
 \end{align}
-$$
+```
 
 **Unrelated vectors:**
-$$
+```math
 \begin{align}
 [1, 0, 0] \cdot [0, 1, 0] &= (1)(0) + (0)(1) + (0)(0) \\
 &= 0 + 0 + 0 \\
 &= 0 \quad \text{← Perpendicular vectors = zero!}
 \end{align}
-$$
+```
 
 **Intuition summary:**
 - **Large positive dot product** → vectors point in same direction (very similar!)
@@ -2977,26 +2987,26 @@ Remember our dating app profiles? Let's see this with actual numbers!
 **Alex's profile headline (Key):** [Pizza: 9, Marriage: 9, Hiking: 8]
 
 **Compatibility (dot product):**
-$$
+```math
 \begin{align}
 \text{score} &= [10, 10, 5] \cdot [9, 9, 8] \\
 &= (10)(9) + (10)(9) + (5)(8) \\
 &= 90 + 90 + 40 \\
 &= 220 \quad \text{← High compatibility!}
 \end{align}
-$$
+```
 
 **Blake's profile headline (Key):** [Pizza: 9, Marriage: 1, Hiking: 8]
 
 **Compatibility (dot product):**
-$$
+```math
 \begin{align}
 \text{score} &= [10, 10, 5] \cdot [9, 1, 8] \\
 &= (10)(9) + (10)(1) + (5)(8) \\
 &= 90 + 10 + 40 \\
 &= 140 \quad \text{← Lower! Marriage mismatch hurt the score!}
 \end{align}
-$$
+```
 
 See how the dot product naturally weights different features? The marriage dimension (10 × 1 = 10) contributed less than the pizza dimension (10 × 9 = 90)!
 
@@ -3007,32 +3017,32 @@ See how the dot product naturally weights different features? The marriage dimen
 **Attention scores for "I":**
 
 Dot product $\mathbf{Q}_I \cdot \mathbf{K}_I$:
-$$
+```math
 \begin{align}
 \text{score}(I \to I) &= [-0.008, -0.127, 0.379] \cdot [0.281, 0.268, -0.017] \\
 &= (-0.008)(0.281) + (-0.127)(0.268) + (0.379)(-0.017) \\
 &= -0.0022 - 0.0340 - 0.0064 \\
 &= -0.0426
 \end{align}
-$$
+```
 
-Dot product $\mathbf{Q}_I \cdot \mathbf{K}_{\text{love}}$:
-$$
+Dot product $\mathbf{Q}\_{I} \cdot \mathbf{K}\_{love}$ : 
+```math
 \begin{align}
 \text{score}(I \to \text{love}) &= [-0.008, -0.127, 0.379] \cdot [0.292, 0.259, 0.028] \\
 &= -0.0023 - 0.0329 + 0.0106 \\
 &= -0.0246
 \end{align}
-$$
+```
 
-Dot product $\mathbf{Q}_I \cdot \mathbf{K}_{\text{pizza}}$:
-$$
+Dot product $\mathbf{Q}\_{I} \cdot \mathbf{K}\_{pizza}$:
+```math
 \begin{align}
 \text{score}(I \to \text{pizza}) &= [-0.008, -0.127, 0.379] \cdot [0.033, -0.529, 0.573] \\
 &= -0.0003 + 0.0672 + 0.2172 \\
 &= 0.2841
 \end{align}
-$$
+```
 
 ### Scaling by $\sqrt{d_k}$
 
@@ -3044,16 +3054,18 @@ $$
 - Prevents the model from learning nuanced attention
 
 The formula:
-$$\text{scaled\_score} = \frac{\mathbf{Q} \cdot \mathbf{K}^T}{\sqrt{d_k}}$$
+```math
+\text{scaled\_score} = \frac{\mathbf{Q} \cdot \mathbf{K}^T}{\sqrt{d_k}}
+```
 
 **Scaled scores for "I":**
-$$
+```math
 \begin{align}
 I \to I: & \quad -0.0426 / 1.732 = -0.0246 \\
 I \to \text{love}: & \quad -0.0246 / 1.732 = -0.0142 \\
 I \to \text{pizza}: & \quad 0.2841 / 1.732 = 0.1640
 \end{align}
-$$
+```
 
 ---
 
@@ -3132,25 +3144,25 @@ Let's use our cake example with exponentials:
 **Raw contribution scores:** [10, 5, 2]
 
 **Step 1: Apply exponential (make positive, amplify differences)**
-$$
+```math
 \begin{align}
 e^{10} &= 22,026 \\
 e^{5} &= 148 \\
 e^{2} &= 7.4
 \end{align}
-$$
+```
 
 **Step 2: Sum**
 $$\text{sum} = 22,026 + 148 + 7.4 = 22,181.4$$
 
 **Step 3: Normalize (divide by sum)**
-$$
+```math
 \begin{align}
 \text{Alice} &= 22,026 / 22,181.4 = 99.3\% \\
 \text{Bob} &= 148 / 22,181.4 = 0.67\% \\
 \text{Charlie} &= 7.4 / 22,181.4 = 0.03\%
 \end{align}
-$$
+```
 
 **Notice what happened!** The differences got amplified:
 - Before: Alice helped 2× more than Bob (10 vs 5)
@@ -3196,13 +3208,13 @@ Example:
 - Exponentials: [2.718, 3.004, 3.320] — differences amplified!
 
 Now our calculations:
-$$
+```math
 \begin{align}
 e^{-0.0246} &= 0.9757 \\
 e^{-0.0142} &= 0.9859 \\
 e^{0.1640} &= 1.1782
 \end{align}
-$$
+```
 
 **How to compute $e^x$ by hand:** Use a calculator or scientific table. For understanding: remember $e^x$ grows exponentially!
 - Small positive x → slightly bigger than 1
@@ -3213,13 +3225,13 @@ $$
 $$\text{sum} = 0.9757 + 0.9859 + 1.1782 = 3.1398$$
 
 **Step 3: Normalize**
-$$
+```math
 \begin{align}
 P(I \to I) &= 0.9757 / 3.1398 = 0.3107 \quad (31.07\%) \\
 P(I \to \text{love}) &= 0.9859 / 3.1398 = 0.3140 \quad (31.40\%) \\
 P(I \to \text{pizza}) &= 1.1782 / 3.1398 = 0.3753 \quad (37.53\%)
 \end{align}
-$$
+```
 
 **Insight:** The word "I" pays most attention to "pizza" (37.53%)! This makes sense—the subject needs to understand what it's connected to later in the sentence.
 
@@ -3267,7 +3279,7 @@ Back to 6 dimensions, but now with multi-perspective understanding!
 **Why do we need this?** The concatenated heads are just "stuck together"—they haven't interacted yet. The output projection learns how to blend insights from different heads.
 
 Weight matrix $\mathbf{W}^O$ (6×6, learned):
-$$
+```math
 \mathbf{W}^O = \begin{bmatrix}
 0.1 & 0.2 & -0.1 & 0.3 & 0.1 & -0.2 \\
 0.2 & -0.1 & 0.3 & 0.1 & 0.2 & 0.1 \\
@@ -3276,15 +3288,15 @@ $$
 0.1 & -0.2 & 0.3 & 0.2 & -0.1 & 0.1 \\
 -0.2 & 0.3 & 0.1 & 0.3 & 0.2 & -0.1
 \end{bmatrix}
-$$
+```
 
 Final attention output (simplified result):
 $$\text{Attention output for "I"} = [0.25, -0.31, 0.42, 0.18, -0.09, 0.33]$$
 
 **Complete attention formula:**
-$$
+```math
 \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}
-$$
+```
 
 This elegant formula captures everything: compute similarity scores (Q·K^T), scale them down (÷√d_k), convert to probabilities (softmax), and create a weighted combination of values (multiply by V).
 
@@ -3545,7 +3557,7 @@ Input (from attention): $[0.25, -0.31, 0.42, 0.18, -0.09, 0.33]$
 **Step 1: Expand to 24 dimensions**
 
 Weight matrix $\mathbf{W}_1$ (showing first 6 of 24 columns for illustration):
-$$
+```math
 \mathbf{W}_1 = \begin{bmatrix}
 0.1 & -0.2 & 0.3 & 0.15 & 0.05 & -0.1 & \ldots \\
 0.2 & 0.3 & -0.1 & 0.25 & -0.15 & 0.2 & \ldots \\
@@ -3554,7 +3566,7 @@ $$
 0.15 & 0.25 & -0.2 & 0.1 & 0.35 & -0.15 & \ldots \\
 -0.2 & 0.1 & 0.3 & -0.1 & 0.2 & 0.15 & \ldots
 \end{bmatrix}_{6 \times 24}
-$$
+```
 
 Bias $\mathbf{b}_1 = [0.1, -0.05, 0.2, 0.15, 0.08, -0.12, \ldots]$ (24 values)
 
@@ -3892,9 +3904,9 @@ $$\text{LayerNorm}(x) = \gamma \odot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} 
 - Multiply corresponding positions: $[a, b] \odot [x, y] = [a×x, b×y]$
 
 Example:
-$$
+```math
 [2, 3, 4] \odot [0.5, 2, 0.1] = [2 \times 0.5, 3 \times 2, 4 \times 0.1] = [1, 6, 0.4]
-$$
+```
 
 This lets each dimension be scaled independently!
 
@@ -3920,7 +3932,7 @@ $$
 $$
 
 Let's calculate each squared difference:
-$$
+```math
 \begin{align}
 (0.66-0.36)^2 &= (0.30)^2 = 0.09 \\
 (-0.49-0.36)^2 &= (-0.85)^2 = 0.7225 \\
@@ -3929,15 +3941,15 @@ $$
 (-0.16-0.36)^2 &= (-0.52)^2 = 0.2704 \\
 (0.71-0.36)^2 &= (0.35)^2 = 0.1225
 \end{align}
-$$
+```
 
 Now sum and divide:
-$$
+```math
 \begin{align}
 \sigma^2 &= \frac{0.09 + 0.7225 + 0.3721 + 0.0121 + 0.2704 + 0.1225}{6} \\
 &= \frac{1.5896}{6} = 0.2649
 \end{align}
-$$
+```
 
 **Intuition:**
 - Small variance (e.g., 0.01) → numbers are close together
@@ -3947,7 +3959,7 @@ $$
 $$\sigma = \sqrt{0.2649 + 0.00001} = \sqrt{0.26491} = 0.5147$$
 
 **Step 4: Normalize each value**
-$$
+```math
 \begin{align}
 \text{norm}_0 &= \frac{0.66 - 0.36}{0.5147} = 0.583 \\
 \text{norm}_1 &= \frac{-0.49 - 0.36}{0.5147} = -1.651 \\
@@ -3956,7 +3968,7 @@ $$
 \text{norm}_4 &= \frac{-0.16 - 0.36}{0.5147} = -1.010 \\
 \text{norm}_5 &= \frac{0.71 - 0.36}{0.5147} = 0.680
 \end{align}
-$$
+```
 
 **Step 5: Apply learned scale and shift**
 
@@ -4202,7 +4214,7 @@ This means the output vocabulary matrix is just the transpose of the input embed
 
 Input embedding lookup: row 999 of $\mathbf{E}$ gives us the vector for "pizza"
 
-Output scoring: We compute dot product of our final hidden state with each row of $\mathbf{W}_{\text{vocab}}$. If $\mathbf{W}_{\text{vocab}} = \mathbf{E}^T$, then each column of $\mathbf{W}_{\text{vocab}}$ is a word's embedding. The dot product measures: "How similar is my current state to the embedding of word X?"
+Output scoring: We compute dot product of our final hidden state with each row of $\mathbf{W}\_{\text{vocab}}$. If $\mathbf{W}\_{\text{vocab}} = \mathbf{E}^T$, then each column of $\mathbf{W}_{\text{vocab}}$ is a word's embedding. The dot product measures: "How similar is my current state to the embedding of word X?"
 
 Words whose embeddings are similar to the final hidden state get high scores—they're likely next words!
 
@@ -4211,9 +4223,9 @@ Not all transformers use weight tying (BERT doesn't, for example), but it's comm
 Final vector for "pizza" position: $[0.71, -0.23, 0.84, 0.45, -0.12, 0.56]$
 
 **Vocabulary projection:**
-$$
+```math
 \text{logits} = [0.71, -0.23, 0.84, 0.45, -0.12, 0.56] \times \mathbf{W}_{\text{vocab}}
-$$
+```
 
 This gives us 50,000 raw scores (logits), one per token:
 
@@ -4234,7 +4246,7 @@ Apply softmax over all 50,000 logits:
 $$P(\text{token } i) = \frac{e^{\text{logit}_i}}{\sum_{j=1}^{50000} e^{\text{logit}_j}}$$
 
 **Calculation example:**
-$$
+```math
 \begin{align}
 e^{-2.3} &= 0.100 \\
 e^{1.8} &= 6.050 \\
@@ -4244,7 +4256,7 @@ e^{2.1} &= 8.166 \\
 e^{4.7} &= 109.947 \\
 &\vdots
 \end{align}
-$$
+```
 
 Sum ≈ 500 (simplified from summing all 50,000 exponentials)
 
@@ -4569,14 +4581,14 @@ P(token 3456 "is") = 0.089 (8.9%)
 ```
 
 **Loss calculation:**
-$
+```math
 \begin{align}
 L &= -\log(P(\text{pizza})) \\
 &= -\log(0.012) \\
 &= -(-4.423) \\
 &= 4.423
 \end{align}
-$
+```
 
 **High loss = bad prediction!** The model was very uncertain about "pizza".
 
@@ -4743,24 +4755,28 @@ Let's trace $W_{\text{vocab}}[0,999]$ (affects "pizza" prediction):
 $\frac{\partial L}{\partial P(\text{pizza})} = -\frac{1}{P(\text{pizza})} = -\frac{1}{0.012} = -83.33$
 
 **Step 2:** Softmax gradient
-$\frac{\partial P(i)}{\partial \text{logit}_j} = \begin{cases} 
+```math
+\frac{\partial P(i)}{\partial \text{logit}_j} = \begin{cases} 
 P(i)(1-P(i)) & \text{if } i=j \\
 -P(i)P(j) & \text{if } i \neq j
-\end{cases}$
+\end{cases}
+```
 
 For "pizza":
 $\frac{\partial P(\text{pizza})}{\partial \text{logit}_{\text{pizza}}} = 0.012 \times (1-0.012) = 0.01186$
 
 **Step 3:** Logit gradient w.r.t. weight
-$\frac{\partial \text{logit}_{\text{pizza}}}{\partial W_{\text{vocab}}[0,999]} = \text{input}[0] = 0.71$
+```math
+\frac{\partial \text{logit}_{\text{pizza}}}{\partial W_{\text{vocab}}[0,999]} = \text{input}[0] = 0.71
+```
 
 **Step 4:** Chain them together
-$
+```math
 \begin{align}
 \frac{\partial L}{\partial W_{\text{vocab}}[0,999]} &= -83.33 \times 0.01186 \times 0.71 \\
 &= -0.702
 \end{align}
-$
+```
 
 This gradient tells us: "Decrease this weight by 0.702 (scaled by learning rate) to reduce loss."
 
@@ -4867,7 +4883,7 @@ Think of it like driving:
 - **Adaptive learning** ($v$): "This road is bumpy (high variance), slow down. That road is smooth, speed up."
 
 **Iteration 1:**
-$
+```math
 \begin{align}
 g_1 &= -0.702 \quad \text{(gradient)} \\
 m_1 &= 0.9 \times 0 + 0.1 \times (-0.702) = -0.0702 \\
@@ -4880,7 +4896,7 @@ W_{\text{new}} &= W - \eta \frac{\hat{m}_1}{\sqrt{\hat{v}_1} + \epsilon} \\
 &= 0.5 + 0.0001 \\
 &= 0.5001
 \end{align}
-$
+```
 
 **Why Adam?**
 - Adapts learning rate per parameter
@@ -5011,7 +5027,7 @@ pizza [ 0.15, 0.19, 0.31]
 When we apply softmax, $e^{-\infty} = 0$, so:
 
 **For "love" (row 2):**
-$
+```math
 \begin{align}
 e^{0.08} &= 1.083 \\
 e^{0.12} &= 1.128 \\
@@ -5021,7 +5037,7 @@ P(\text{love} \to I) &= 1.083/2.211 = 0.490 \\
 P(\text{love} \to \text{love}) &= 1.128/2.211 = 0.510 \\
 P(\text{love} \to \text{pizza}) &= 0/2.211 = 0 \quad \text{← Blocked!}
 \end{align}
-$
+```
 
 "love" can only attend to "I" and itself, not future words!
 
