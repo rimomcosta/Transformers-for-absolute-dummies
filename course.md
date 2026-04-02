@@ -12,6 +12,8 @@ Hey there! 👋 Grab your pencil, paper, and maybe some crayons—we're building
 
 ## Introduction: What Are Transformers Really?
 
+![Introduction Illustration](output/imagegen/chapters/introduction-what-are-transformers.png)
+
 Before diving into the technical details, let's understand what transformers are at a fundamental level—no code, just concepts.
 
 ### Wait—What IS a Transformer?
@@ -103,6 +105,24 @@ Deep understanding
 Probabilities for next word: "delicious" (42%), "and" (18%), ...
 ```
 
+```mermaid
+flowchart LR
+    A["Raw text<br/>I love pizza"] --> B["Tokenization<br/>split text into token IDs"]
+    B --> C["Embedding lookup<br/>convert IDs into vectors"]
+    C --> D["Add positional information<br/>teach word order"]
+    D --> E["Transformer blocks × N<br/>attention + feed-forward"]
+    E --> F["Output head<br/>project to vocabulary logits"]
+    F --> G["Softmax<br/>convert logits to probabilities"]
+    G --> H["Pick next token"]
+    H --> I["Append token and repeat"]
+
+    classDef process fill:#E8F0FE,stroke:#1A73E8,color:#111;
+    classDef output fill:#FFF4E5,stroke:#F29900,color:#111;
+
+    class A,B,C,D,E,F,G process;
+    class H,I output;
+```
+
 Each transformation is a mathematical operation, and crucially, **all these operations are differentiable**—meaning we can use calculus to figure out how to improve them.
 
 ### The Three Core Innovations
@@ -141,6 +161,8 @@ The same architecture, just different data! That's the power of a truly general-
 
 ## Math Symbols Quick Reference (Your Decoder Ring!)
 
+![Math Symbols Illustration](output/imagegen/chapters/math-symbols-quick-reference.png)
+
 **Before we start, let's demystify every symbol you'll see!** Anytime you encounter a symbol and think "What the hell is this?", come back to this section. Consider it your decoder ring for the tutorial!
 
 ### Common Math Symbols
@@ -167,7 +189,7 @@ Greek letters are just variable names - like using "x" but fancier!
 | Symbol | Name | Commonly Used For | Example in Tutorial |
 |--------|------|-------------------|---------------------|
 | α | Alpha | Learning rate variations | (less common in our tutorial) |
-| β | Beta | Momentum, shift parameter | β₁ = 0.9 (Adam optimizer) |
+| β | Beta | Momentum, shift parameter | β<sub>1</sub> = 0.9 (Adam optimizer) |
 | γ | Gamma | Scale parameter | γ in LayerNorm (learned scale) |
 | ε | Epsilon | Tiny safety number | ε = 0.00001 (prevents divide-by-zero) |
 | η | Eta | Learning rate | η = 0.0001 (step size) |
@@ -263,6 +285,8 @@ By the end, you'll understand every single operation in ChatGPT—just scaled up
 
 ## Chapter 0: The Grand Vision
 
+![Chapter 0 Illustration](output/imagegen/chapters/chapter-00-grand-vision.png)
+
 ### What Problem Are We Solving?
 
 Imagine you type "I love" into ChatGPT. How does it know "pizza" or "coding" are good next words, but "purple" isn't? That's what transformers solve: **predicting the next word** based on everything that came before.
@@ -289,6 +313,8 @@ This notation means: The probability of the whole sentence equals the probabilit
 ---
 
 ## Chapter 1: Building Our Vocabulary (The Dictionary)
+
+![Chapter 1 Illustration](output/imagegen/chapters/chapter-01-vocabulary.png)
 
 Computers only speak numbers, so we create a giant dictionary mapping words to IDs. Think of it like assigning a unique ID number to every student in a huge school—instead of saying "Sarah," you could say "Student #567."
 
@@ -330,6 +356,8 @@ Imagine organizing a massive library. You could shelve books by title alphabetic
 
 ## Chapter 2: Tokenization (Chopping Text into Pieces)
 
+![Chapter 2 Illustration](output/imagegen/chapters/chapter-02-tokenization.png)
+
 ### Understanding the Problem
 
 Let's say we have our vocabulary of 50,000 tokens. Simple case first:
@@ -356,6 +384,8 @@ Easy! But what happens with a word not in our dictionary?
 **Good Solution:** Break unknown words into known pieces!
 
 ### The Byte-Pair Encoding (BPE) Solution
+
+![BPE Merge Process Diagram](output/explainers/bpe-merge-specific.svg)
 
 BPE is like a smart puzzle solver. When it sees "cryptocurrency":
 
@@ -416,6 +446,8 @@ Word level:      "the", "pizza", "love"
 ---
 
 ## Chapter 3: Embeddings (Giving Numbers Meaning)
+
+![Chapter 3 Illustration](output/imagegen/chapters/chapter-03-embeddings.png)
 
 ### The Problem: One Number Isn't Enough
 
@@ -633,7 +665,7 @@ Think of it like a spreadsheet:
 ```
 Embedding Matrix E (showing just 3 words out of 50,000):
 
-Token ID  Word      dim₀    dim₁    dim₂    dim₃    dim₄    dim₅
+Token ID  Word      dim<sub>0</sub>    dim<sub>1</sub>    dim<sub>2</sub>    dim<sub>3</sub>    dim<sub>4</sub>    dim<sub>5</sub>
 --------  ----      ----    ----    ----    ----    ----    ----
    123    "I"       0.01   -0.20    0.30    0.15   -0.05    0.11
    567    "love"   -0.40    0.60    0.00    0.25    0.90   -0.30
@@ -654,6 +686,8 @@ Token ID  Word      dim₀    dim₁    dim₂    dim₃    dim₄    dim₅
 - The dimensions self-organize to capture useful patterns
 
 ### Looking Up Embeddings: From Token ID to Meaning Vector
+
+![Embedding Lookup Diagram](output/explainers/embedding-lookup-specific.svg)
 
 When we want the embedding for token 123 ("I"), we simply grab row 123 from the table:
 
@@ -689,13 +723,15 @@ $$
 - Row 1 = embedding for "I"
 - Row 2 = embedding for "love"  
 - Row 3 = embedding for "pizza"
-- Column 1 (dim₀) = first learned property (all 3 words have values for this)
-- Column 2 (dim₁) = second learned property
+- Column 1 (dim<sub>0</sub>) = first learned property (all 3 words have values for this)
+- Column 2 (dim<sub>1</sub>) = second learned property
 - ... and so on
 
 This matrix is what flows into our transformer! Each row represents one word's meaning as a 6-dimensional vector.
 
 ### What Each Dimension Learns (After Training)
+
+![Embedding Similarity Space Diagram](output/explainers/embedding-space-similarity.svg)
 
 Remember: we **don't** tell the model what each dimension should mean. But after training on billions of sentences, patterns emerge! Here's what might happen (this is speculative—the model figures it out):
 
@@ -789,7 +825,12 @@ This is the magic of machine learning—meaningful structure emerges from random
 
 ## Chapter 4: Positional Encoding (Teaching Word Order)
 
+![Chapter 4 Illustration](output/imagegen/chapters/chapter-04-positional-encoding.png)
+
 ## Part 1: Understanding the Core Problem
+
+![Positional Encoding Core Problem Illustration](output/imagegen/sections/chapter-04-part-1-core-problem.png)
+![Order Blindness Diagram](output/explainers/positional-order-blindness.svg)
 
 ### The Parallelism Discovery
 
@@ -1395,6 +1436,8 @@ We're getting warmer! We have the RIGHT IDEA (different scales for different dim
 
 ## Part 3: The Breakthrough — Understanding Waves
 
+![Positional Encoding Waves Illustration](output/imagegen/sections/chapter-04-part-3-waves.png)
+
 **What do we actually need?** Let's step back and think clearly:
 
 1. **Bounded values** — Must stay in a reasonable range (like -1 to +1), never explode
@@ -1710,6 +1753,8 @@ Now let's see exactly HOW we turn this brilliant idea into actual numbers...
 
 ## Part 4: Building the Solution Step-by-Step
 
+![Positional Encoding Construction Illustration](output/imagegen/sections/chapter-04-part-4-building-solution.png)
+
 Now we're ready to construct the actual positional encoding formula. We'll build it piece by piece, explaining every single component.
 
 ### The Complete Formula (Overview First)
@@ -1936,22 +1981,22 @@ Let's calculate the encoding for position 0, 1, and 2 (our three words) with com
 
 **Position 0 ("I"):**
 
-For dim₀ (even, $i=0$): 
+For dim<sub>0</sub> (even, $i=0$): 
 $$\text{PE}(0, 0) = \sin\left(\frac{0}{10000^{0/6}}\right) = \sin(0) = 0.0000$$
 
-For dim₁ (odd, $i=0$):
+For dim<sub>1</sub> (odd, $i=0$):
 $$\text{PE}(0, 1) = \cos\left(\frac{0}{10000^{0/6}}\right) = \cos(0) = 1.0000$$
 
-For dim₂ (even, $i=1$):
+For dim<sub>2</sub> (even, $i=1$):
 $$\text{PE}(0, 2) = \sin\left(\frac{0}{10000^{2/6}}\right) = \sin(0) = 0.0000$$
 
-For dim₃ (odd, $i=1$):
+For dim<sub>3</sub> (odd, $i=1$):
 $$\text{PE}(0, 3) = \cos\left(\frac{0}{10000^{2/6}}\right) = \cos(0) = 1.0000$$
 
-For dim₄ (even, $i=2$):
+For dim<sub>4</sub> (even, $i=2$):
 $$\text{PE}(0, 4) = \sin\left(\frac{0}{10000^{4/6}}\right) = \sin(0) = 0.0000$$
 
-For dim₅ (odd, $i=2$):
+For dim<sub>5</sub> (odd, $i=2$):
 $$\text{PE}(0, 5) = \cos\left(\frac{0}{10000^{4/6}}\right) = \cos(0) = 1.0000$$
 
 **Position 0 encoding:** $[0.00, 1.00, 0.00, 1.00, 0.00, 1.00]$
@@ -1998,7 +2043,7 @@ Three positions aren't enough to really SEE the beautiful pattern. Let's calcula
 
 **Position Encoding Table** (rounded for clarity):
 
-| Position | dim₀  | dim₁  | dim₂  | dim₃  | dim₄  | dim₅  |
+| Position | dim<sub>0</sub>  | dim<sub>1</sub>  | dim<sub>2</sub>  | dim<sub>3</sub>  | dim<sub>4</sub>  | dim<sub>5</sub>  |
 |----------|-------|-------|-------|-------|-------|-------|
 | 0        | 0.00  | 1.00  | 0.00  | 1.00  | 0.00  | 1.00  |
 | 1        | 0.84  | 0.54  | 0.05  | 1.00  | 0.00  | 1.00  |
@@ -2038,6 +2083,8 @@ Try picking any two rows — they're always different. That's how the model know
 
 ### Step 2: Combining with Word Embeddings
 
+![Embedding Plus Position Diagram](output/explainers/embedding-plus-position-specific.svg)
+
 Now comes the crucial part: we need to COMBINE the position information with the word meaning!
 
 **Recall from Chapter 3**, our word embeddings are:
@@ -2062,7 +2109,7 @@ Three positions aren't enough to really SEE the beautiful pattern. Let's calcula
 
 **Position Encoding Table** (rounded for clarity):
 
-| Position | dim₀  | dim₁  | dim₂  | dim₃  | dim₄  | dim₅  |
+| Position | dim<sub>0</sub>  | dim<sub>1</sub>  | dim<sub>2</sub>  | dim<sub>3</sub>  | dim<sub>4</sub>  | dim<sub>5</sub>  |
 |----------|-------|-------|-------|-------|-------|-------|
 | 0        | 0.00  | 1.00  | 0.00  | 1.00  | 0.00  | 1.00  |
 | 1        | 0.84  | 0.54  | 0.05  | 1.00  | 0.00  | 1.00  |
@@ -2381,9 +2428,14 @@ is the rotation matrix for offset $k$!
 
 ## Chapter 5: Multi-Head Self-Attention (The Heart)
 
+![Chapter 5 Illustration](output/imagegen/chapters/chapter-05-self-attention.png)
+
 This is where the magic happens! This is the innovation that made transformers revolutionary. After reading this chapter, you'll understand how words "talk" to each other and decide who's important.
 
 ## Part 1: Understanding the Core Concept
+
+![Self-Attention Core Concept Illustration](output/imagegen/sections/chapter-05-part-1-core-concept.png)
+![Pronoun Resolution with Self-Attention](output/explainers/self-attention-pronoun-resolution.svg)
 
 ### The Communication Problem
 
@@ -2610,6 +2662,8 @@ Each word looks at ALL other words (including itself!) and decides how much atte
 
 ### The Three Components: Query, Key, Value
 
+![Specific QKV Roles Diagram](output/explainers/qkv-roles-specific.svg)
+
 Let's break down these three mysterious terms:
 
 **Query (Q): "What am I looking for?"**
@@ -2663,6 +2717,33 @@ New representation of "I" =
   19% × V_I + 31% × V_love + 50% × V_pizza
 ```
 
+```mermaid
+flowchart LR
+    A["Input token embeddings"] --> B["Linear projections"]
+    B --> C["Queries (Q)"]
+    B --> D["Keys (K)"]
+    B --> E["Values (V)"]
+    C --> F["Dot-product scores<br/>Q x K^T"]
+    D --> F
+    F --> G["Scale by 1 / sqrt(d_k)"]
+    G --> H["Apply causal mask<br/>(decoder-only)"]
+    H --> I["Softmax<br/>attention weights"]
+    I --> J["Weighted sum of V"]
+    E --> J
+    J --> K["Per-head output"]
+    K --> L["Concatenate heads"]
+    L --> M["Output projection"]
+    M --> N["Context-aware representations"]
+
+    classDef input fill:#E6F4EA,stroke:#2E7D32,color:#111;
+    classDef math fill:#E8F0FE,stroke:#1A73E8,color:#111;
+    classDef result fill:#FFF4E5,stroke:#F29900,color:#111;
+
+    class A input;
+    class B,C,D,E,F,G,H,I,J,K,L,M math;
+    class N result;
+```
+
 **Result:** The word "I" now has an UPDATED representation that incorporates information from all words (but mostly from "pizza" since it got 50% attention)!
 
 **And here's the magic:** This happens for ALL words SIMULTANEOUSLY!
@@ -2675,6 +2756,8 @@ All at the same time, in parallel! That's why transformers are so fast!
 ---
 
 ## Part 2: Multi-Head Attention (Why Multiple Perspectives?)
+
+![Multi-Head Attention Illustration](output/imagegen/sections/chapter-05-part-2-multi-head.png)
 
 Before we dive into calculations, we need to understand a crucial design decision: **Why do we have multiple attention heads?**
 
@@ -3014,6 +3097,8 @@ See how the dot product naturally weights different features? The marriage dimen
 
 ### Computing Attention Scores for Our Sentence
 
+![Attention Score Matrix Diagram](output/explainers/attention-score-matrix.svg)
+
 **Attention scores for "I":**
 
 Dot product $\mathbf{Q}_I \cdot \mathbf{K}_I$:
@@ -3187,6 +3272,8 @@ The differences are amplified, but everyone still gets at least a tiny bit of at
 
 ### Applying Softmax to Attention Scores
 
+![Softmax Weighting Diagram](output/explainers/softmax-weighting-bars.svg)
+
 **Step 1: Calculate exponentials**
 
 **What is $e$?** Euler's number, $e \approx 2.71828...$, is a special mathematical constant. Like π (pi), it appears everywhere in nature and math!
@@ -3266,6 +3353,8 @@ $$\text{Head 2 output for "I"} = [0.245, -0.089, 0.156]$$
 
 ### Concatenation
 
+![Multi-Head Recombination Diagram](output/explainers/multi-head-recombination.svg)
+
 Stick both head outputs together:
 
 $$
@@ -3307,6 +3396,8 @@ The output projection is like a film director with footage from multiple cameras
 ---
 
 ## Chapter 6: Dropout (The Training Safety Net)
+
+![Chapter 6 Illustration](output/imagegen/chapters/chapter-06-dropout.png)
 
 ### The Overfitting Problem
 
@@ -3444,6 +3535,8 @@ Modern transformers typically use dropout rates between 0.1 (drop 10% of neurons
 
 ## Chapter 7: Feed-Forward Network (Individual Processing)
 
+![Chapter 7 Illustration](output/imagegen/chapters/chapter-07-feed-forward-network.png)
+
 ### The Two-Stage Process: Gather, Then Think
 
 We've just finished attention (Chapter 5)—words gathered information from each other. But gathering information isn't enough! Now each word needs to PROCESS that information.
@@ -3505,7 +3598,7 @@ No matter how many layers, we'd only be able to learn simple, linear patterns!
 **FFN introduces non-linearity:**
 - Through the ReLU activation: $\text{ReLU}(x) = \max(0, x)$
 - This allows the network to learn complex, non-linear patterns
-- Like the difference between learning "2x + 3" vs learning "if x < 0, then A, otherwise B²"
+- Like the difference between learning "2x + 3" vs learning "if x < 0, then A, otherwise B<sup>2</sup>"
 
 ### The Architecture
 
@@ -3693,6 +3786,8 @@ These variants often improve performance by allowing the network to learn more c
 
 ## Chapter 8: Residual Connections & Layer Normalization
 
+![Chapter 8 Illustration](output/imagegen/chapters/chapter-08-residual-layernorm.png)
+
 ### The Gradient Flow Problem
 
 **Why do we need residual connections?** Let's understand the problem they solve.
@@ -3724,6 +3819,8 @@ By the time the message reaches Person 51, it's completely garbled! Information 
 **Same with gradients:** After flowing through 50 layers, the gradient signal becomes too weak or distorted for early layers to learn effectively.
 
 ### Residual Connections (The Highway Solution)
+
+![Residual Highway Diagram](output/explainers/residual-highway-specific.svg)
 
 **The brilliant fix:** Create a "shortcut" or "highway" that bypasses layers!
 
@@ -3830,6 +3927,8 @@ $$\frac{\partial (x + f(x))}{\partial x} = 1 + \frac{\partial f(x)}{\partial x}$
 The "+1" ensures gradient flow even if $\frac{\partial f(x)}{\partial x} \to 0$
 
 ### Layer Normalization
+
+![Layer Normalization Balance Diagram](output/explainers/layernorm-balance-specific.svg)
 
 ### The Test Score Standardization Analogy
 
@@ -4009,6 +4108,8 @@ The difference? Pre-LayerNorm normalizes before the operation instead of after. 
 
 ## Chapter 9: Stacking Transformer Blocks
 
+![Chapter 9 Illustration](output/imagegen/chapters/chapter-09-stacking-blocks.png)
+
 ### The Complete Block
 
 One transformer block consists of:
@@ -4187,9 +4288,13 @@ Each block adds a layer of sophistication! The representation progressively capt
 
 ## Chapter 10: The Output Head (Predicting Next Token)
 
+![Chapter 10 Illustration](output/imagegen/chapters/chapter-10-output-head.png)
+
 After all transformer blocks, we have a final 6-dimensional vector for each position. We need to convert this to probabilities over our entire **50,000-word vocabulary**.
 
 ### Linear Transformation to Vocabulary
+
+![Output Head to Vocabulary Logits Diagram](output/explainers/output-head-logits-specific.svg)
 
 **Weight matrix:** $\mathbf{W}_{\text{vocab}}$ with shape $6 \times 50000$
 
@@ -4240,6 +4345,8 @@ logits[3456] ("is") = 4.7
 ```
 
 ### Softmax to Probabilities
+
+![Vocabulary Softmax Distribution Diagram](output/explainers/output-softmax-distribution-specific.svg)
 
 Apply softmax over all 50,000 logits:
 
@@ -4432,6 +4539,8 @@ In practice, modern systems like ChatGPT typically combine these: use temperatur
 
 ## Chapter 11: Training the Transformer (The Learning Process)
 
+![Chapter 11 Illustration](output/imagegen/chapters/chapter-11-training.png)
+
 Now for the magic: how do those random weights become intelligent?
 
 ### The Training Data
@@ -4455,6 +4564,8 @@ Input: "Machine learning is" → Target: "fascinating"
 - **Epochs:** 10 (how many times we see the entire dataset)
 
 ### The Loss Function (Cross-Entropy)
+
+![Cross-Entropy Confidence Diagram](output/explainers/cross-entropy-specific.svg)
 
 After the model predicts probabilities, we compare to the actual next word using **cross-entropy loss**.
 
@@ -4653,6 +4764,8 @@ $$
 
 ### Backpropagation (The Learning Engine)
 
+![Backpropagation Illustration](output/imagegen/sections/chapter-11-backpropagation.png)
+
 Now we need to answer the critical question: **"How do we know which weights to adjust and by how much?"**
 
 This is done through **backpropagation**—the learning engine of neural networks!
@@ -4689,6 +4802,8 @@ Customer review: "The food was terrible!" (high loss!)
 **Backpropagation does EXACTLY this!** It traces backward through all the layers to figure out "which weights contributed most to the error?"
 
 ### The Chain Rule (Understanding Cascading Effects)
+
+![Chain Rule Cascade Diagram](output/explainers/chain-rule-cascade.svg)
 
 **What is the chain rule?** It's about understanding cascading effects.
 
@@ -4782,6 +4897,8 @@ This gradient tells us: "Decrease this weight by 0.702 (scaled by learning rate)
 
 ### The Complete Gradient Flow
 
+![Gradient Flow Through the Stack](output/explainers/gradient-flow-stack.svg)
+
 Backpropagation flows through every layer:
 
 ```
@@ -4815,6 +4932,8 @@ Embeddings
 **Key insight:** Residual connections ensure gradients don't vanish. Without them, gradient might shrink to 0.0001 by block 1!
 
 ### Gradient Descent (Updating Weights)
+
+![Gradient Descent Weight Update Diagram](output/explainers/gradient-descent-weight-update.svg)
 
 Once we have all gradients, we update every weight:
 
@@ -4944,6 +5063,9 @@ Epoch 10:
 
 ## Chapter 12: Causal Masking (No Cheating!)
 
+![Chapter 12 Illustration](output/imagegen/chapters/chapter-12-causal-masking.png)
+![Causal Masking Visibility Diagram](output/explainers/causal-masking-visibility.svg)
+
 ### The Cheating Problem
 
 **Imagine taking a multiple-choice test** where all the answers are printed at the bottom of the page:
@@ -4951,7 +5073,7 @@ Epoch 10:
 ```
 Question 1: What is 2 + 2?
 Question 2: What is the capital of France?
-Question 3: What is H₂O?
+Question 3: What is H<sub>2</sub>O?
 
 Answers: 4, Paris, Water
 ```
@@ -5055,9 +5177,13 @@ scores = scores + mask  # Before softmax
 
 ## Chapter 13: Inference (Using the Trained Model)
 
+![Chapter 13 Illustration](output/imagegen/chapters/chapter-13-inference.png)
+
 After training, we have a powerful model. Now let's use it to generate text!
 
 ### The Story-Writing Process
+
+![Autoregressive Loop Diagram](output/explainers/autoregressive-loop-specific.svg)
 
 **Imagine you're writing a story, one word at a time:**
 
@@ -5190,6 +5316,9 @@ Continue until:
 
 ### KV Cache Optimization (Critical for Making Generation Fast!)
 
+![KV Cache Illustration](output/imagegen/sections/chapter-13-kv-cache.png)
+![KV Cache Reuse Diagram](output/explainers/kv-cache-reuse.svg)
+
 **This isn't just an "optimization"—it's the fundamental mechanism that makes autoregressive generation computationally feasible!** Without it, ChatGPT would be 50-100× slower!
 
 ### The Recomputation Disaster
@@ -5201,21 +5330,21 @@ Continue until:
 **Without caching (wasteful - the naive approach):**
 ```
 Iteration 1: "I love"
-- Compute Q₁, K₁, V₁ for "I"
-- Compute Q₂, K₂, V₂ for "love"
+- Compute Q<sub>1</sub>, K<sub>1</sub>, V<sub>1</sub> for "I"
+- Compute Q<sub>2</sub>, K<sub>2</sub>, V<sub>2</sub> for "love"
 - Run attention
 
 Iteration 2: "I love pizza"
-- Compute Q₁, K₁, V₁ for "I" ← REDUNDANT! Already did this
-- Compute Q₂, K₂, V₂ for "love" ← REDUNDANT!
-- Compute Q₃, K₃, V₃ for "pizza"
+- Compute Q<sub>1</sub>, K<sub>1</sub>, V<sub>1</sub> for "I" ← REDUNDANT! Already did this
+- Compute Q<sub>2</sub>, K<sub>2</sub>, V<sub>2</sub> for "love" ← REDUNDANT!
+- Compute Q<sub>3</sub>, K<sub>3</sub>, V<sub>3</sub> for "pizza"
 - Run attention
 
 Iteration 3: "I love pizza and"
-- Compute Q₁, K₁, V₁ for "I" ← REDUNDANT!
-- Compute Q₂, K₂, V₂ for "love" ← REDUNDANT!
-- Compute Q₃, K₃, V₃ for "pizza" ← REDUNDANT!
-- Compute Q₄, K₄, V₄ for "and"
+- Compute Q<sub>1</sub>, K<sub>1</sub>, V<sub>1</sub> for "I" ← REDUNDANT!
+- Compute Q<sub>2</sub>, K<sub>2</sub>, V<sub>2</sub> for "love" ← REDUNDANT!
+- Compute Q<sub>3</sub>, K<sub>3</sub>, V<sub>3</sub> for "pizza" ← REDUNDANT!
+- Compute Q<sub>4</sub>, K<sub>4</sub>, V<sub>4</sub> for "and"
 - Run attention
 ```
 
@@ -5224,21 +5353,21 @@ We're recomputing the same K and V values over and over!
 **With caching (efficient):**
 ```
 Iteration 1: "I love"
-- Compute Q₁, K₁, V₁ for "I"
-- Compute Q₂, K₂, V₂ for "love"
-- Store K₁, V₁, K₂, V₂ in cache
+- Compute Q<sub>1</sub>, K<sub>1</sub>, V<sub>1</sub> for "I"
+- Compute Q<sub>2</sub>, K<sub>2</sub>, V<sub>2</sub> for "love"
+- Store K<sub>1</sub>, V<sub>1</sub>, K<sub>2</sub>, V<sub>2</sub> in cache
 - Run attention
 
 Iteration 2: "I love pizza"
-- Load K₁, V₁, K₂, V₂ from cache ← FAST!
-- Only compute Q₃, K₃, V₃ for "pizza"
-- Store K₃, V₃ in cache
+- Load K<sub>1</sub>, V<sub>1</sub>, K<sub>2</sub>, V<sub>2</sub> from cache ← FAST!
+- Only compute Q<sub>3</sub>, K<sub>3</sub>, V<sub>3</sub> for "pizza"
+- Store K<sub>3</sub>, V<sub>3</sub> in cache
 - Run attention
 
 Iteration 3: "I love pizza and"
-- Load K₁, V₁, K₂, V₂, K₃, V₃ from cache ← FAST!
-- Only compute Q₄, K₄, V₄ for "and"
-- Store K₄, V₄ in cache
+- Load K<sub>1</sub>, V<sub>1</sub>, K<sub>2</sub>, V<sub>2</sub>, K<sub>3</sub>, V<sub>3</sub> from cache ← FAST!
+- Only compute Q<sub>4</sub>, K<sub>4</sub>, V<sub>4</sub> for "and"
+- Store K<sub>4</sub>, V<sub>4</sub> in cache
 - Run attention
 ```
 
@@ -5277,12 +5406,12 @@ For generating 100 tokens: 5,050 operations → 101 operations (50× speedup!)
 
 **Total:** $1 + 2 + 3 + ... + 100 = \frac{100 \times 101}{2} = 5,050$ operations
 
-**This is O(n²) complexity** - quadratic! If you generate 1000 tokens, you need 500,000 operations!
+**This is O(n<sup>2</sup>) complexity** - quadratic! If you generate 1000 tokens, you need 500,000 operations!
 
 **With KV cache:**
-- Token 1: Do 1 computation, cache K₁, V₁
-- Token 2: Do 1 computation (reuse K₁, V₁), cache K₂, V₂
-- Token 3: Do 1 computation (reuse K₁, V₁, K₂, V₂), cache K₃, V₃
+- Token 1: Do 1 computation, cache K<sub>1</sub>, V<sub>1</sub>
+- Token 2: Do 1 computation (reuse K<sub>1</sub>, V<sub>1</sub>), cache K<sub>2</sub>, V<sub>2</sub>
+- Token 3: Do 1 computation (reuse K<sub>1</sub>, V<sub>1</sub>, K<sub>2</sub>, V<sub>2</sub>), cache K<sub>3</sub>, V<sub>3</sub>
 - ...
 - Token 100: Do 1 computation (reuse all cached)
 
@@ -5350,6 +5479,8 @@ Token 100000: 940 GB ← Claude 3 scale, needs distributed systems!
 ---
 
 ## Chapter 14: All the Hyperparameters (The Control Panel)
+
+![Chapter 14 Illustration](output/imagegen/chapters/chapter-14-hyperparameters.png)
 
 ### Understanding the Control Panel
 
@@ -5503,6 +5634,8 @@ Step 100000: η = 0.00006  (minimum)
 ---
 
 ## Chapter 15: Additional Techniques
+
+![Chapter 15 Illustration](output/imagegen/chapters/chapter-15-additional-techniques.png)
 
 ### Gradient Accumulation
 
@@ -5676,6 +5809,8 @@ $\sigma = \sqrt{\frac{2}{6+24}} = \sqrt{0.0667} = 0.258$
 
 ## Chapter 16: Common Training Problems & Solutions
 
+![Chapter 16 Illustration](output/imagegen/chapters/chapter-16-training-problems.png)
+
 ### The Troubleshooting Guide
 
 **Training a transformer is like learning to ride a bicycle** - sometimes things go wrong, and you need to diagnose the problem!
@@ -5756,6 +5891,8 @@ Validation loss: 4.623 ← Also bad
 ---
 
 ## Chapter 17: Putting It All Together (Complete Example)
+
+![Chapter 17 Illustration](output/imagegen/chapters/chapter-17-putting-it-all-together.png)
 
 ### The Grand Tour: Following One Sentence Through the Entire Transformer
 
@@ -5859,6 +5996,8 @@ Next token: "delicious" (4567)
 ---
 
 ## Chapter 18: From Language Model to ChatGPT (The Three Training Stages)
+
+![Chapter 18 Illustration](output/imagegen/chapters/chapter-18-chatgpt-training-stages.png)
 
 ### The Critical Missing Piece
 
@@ -6033,6 +6172,8 @@ Target: "def sort_list(arr):\n    return sorted(arr)"
 
 ## Part 3: Instruction Tuning & RLHF (Making It Helpful)
 
+![Instruction Tuning and RLHF Illustration](output/imagegen/sections/chapter-18-part-3-rlhf.png)
+
 ### The Critical Gap: Why ChatGPT ≠ GPT-3
 
 **Here's what confuses everyone:**
@@ -6086,6 +6227,8 @@ Response: "[actual poem, not just continuing the prompt]"
 
 ### Stage 3b: RLHF (Reinforcement Learning from Human Feedback)
 
+![RLHF Preference Comparison Diagram](output/explainers/rlhf-preference-comparison.svg)
+
 **The problem:** Even after instruction tuning, the model might:
 - Give correct but unhelpful answers
 - Be rude or inappropriate
@@ -6127,28 +6270,25 @@ Do this for thousands of prompts → Dataset of ranked responses
 
 ### The Three Stages Visualized
 
-```
-STAGE 1: PRE-TRAINING ($10M, months)
-├─ Dataset: All internet text (billions of documents)
-├─ Objective: Predict next word
-├─ Result: Base GPT-3
-└─ Capabilities: Knows language, has knowledge, completes text
+```mermaid
+flowchart LR
+    A["Huge text corpus<br/>books, code, web, articles"] --> B["Pre-training<br/>predict the next token"]
+    B --> C["Base language model<br/>good at continuation, not yet aligned"]
+    C --> D["Supervised fine-tuning<br/>high-quality prompt -> response examples"]
+    D --> E["Instruction-following assistant"]
+    E --> F["Human preference data<br/>better vs worse responses"]
+    F --> G["Reward model"]
+    E --> H["RLHF optimization"]
+    G --> H
+    H --> I["Helpful, safer, more aligned assistant"]
 
-    ↓ (fine-tune)
+    classDef data fill:#E6F4EA,stroke:#2E7D32,color:#111;
+    classDef train fill:#E8F0FE,stroke:#1A73E8,color:#111;
+    classDef model fill:#FFF4E5,stroke:#F29900,color:#111;
 
-STAGE 2: INSTRUCTION TUNING ($50K, days)
-├─ Dataset: 100K instruction-response pairs
-├─ Objective: Follow instructions correctly
-├─ Result: InstructGPT
-└─ Capabilities: Follows instructions, answers questions
-
-    ↓ (RLHF)
-
-STAGE 3: RLHF ($100K, weeks)
-├─ Dataset: Human preference rankings
-├─ Objective: Maximize human preference score
-├─ Result: ChatGPT
-└─ Capabilities: Helpful, harmless, honest assistant
+    class A,F data;
+    class B,D,G,H train;
+    class C,E,I model;
 ```
 
 ### What This Means for You
@@ -6366,6 +6506,8 @@ Let's trace how ChatGPT was actually made:
 
 ## Chapter 19: The Three Transformer Architectures (Decoder, Encoder, Encoder-Decoder)
 
+![Chapter 19 Illustration](output/imagegen/chapters/chapter-19-transformer-architectures.png)
+
 ### The Critical Question: What Exactly Did We Build?
 
 **Here's something important we haven't told you yet:** The transformer architecture actually comes in **THREE different flavors**, and we've been teaching you ONE specific type!
@@ -6385,6 +6527,9 @@ Let's understand all three so you're not confused when you hear about BERT or T5
 ---
 
 ## Part 1: Understanding the Three Architectures
+
+![Three Architectures Deep-Dive Illustration](output/imagegen/sections/chapter-19-part-1-three-architectures.png)
+![Specific Architecture Comparison Diagram](output/explainers/three-architectures-specific.svg)
 
 ### The Restaurant Analogy (Three Different Restaurant Types)
 
@@ -6449,39 +6594,38 @@ Let's understand all three so you're not confused when you hear about BERT or T5
 
 ### Visual Comparison
 
-```
-ENCODER-ONLY (BERT):
-Input: "The cat sat on the ___"
-[Can see entire sentence, including "mat"]
-↓
-All attention is bidirectional ↔
-↓
-Output: Classification/understanding
-Purpose: Understand text, answer questions
+```mermaid
+flowchart TB
+    subgraph A["Decoder-only (GPT-style)"]
+        A1["Input tokens"]
+        A2["Masked self-attention blocks"]
+        A3["Next-token predictions"]
+        A1 --> A2 --> A3
+    end
 
-DECODER-ONLY (GPT): ← YOU LEARNED THIS!
-Input: "The cat sat on the"
-[Cannot see future words]
-↓
-Causal masking: only see past ←
-↓  
-Output: "mat" (generated)
-↓
-Add to input: "The cat sat on the mat"
-↓
-Output: Next word...
-Purpose: Generate text, complete sentences
+    subgraph B["Encoder-only (BERT-style)"]
+        B1["Input tokens"]
+        B2["Bidirectional self-attention blocks"]
+        B3["Representations for classification, search, extraction"]
+        B1 --> B2 --> B3
+    end
 
-ENCODER-DECODER (T5):
-Input: "Translate: I love pizza"
-↓
-ENCODER: Process full input ↔ (bidirectional)
-↓
-[Encoded representation]
-↓
-DECODER: Generate output ← (causal)
-"J'" → "aime" → "la" → "pizza"
-Purpose: Transform text (translate, summarize, etc.)
+    subgraph C["Encoder-decoder (T5-style)"]
+        C1["Source input"]
+        C2["Encoder"]
+        C3["Cross-attention"]
+        C4["Decoder"]
+        C5["Generated output"]
+        C1 --> C2 --> C3 --> C4 --> C5
+    end
+
+    classDef decoder fill:#E8F0FE,stroke:#1A73E8,color:#111;
+    classDef encoder fill:#E6F4EA,stroke:#2E7D32,color:#111;
+    classDef hybrid fill:#FFF4E5,stroke:#F29900,color:#111;
+
+    class A,A1,A2,A3 decoder;
+    class B,B1,B2,B3 encoder;
+    class C,C1,C2,C3,C4,C5 hybrid;
 ```
 
 ---
@@ -6918,6 +7062,8 @@ The cross-attention lets the decoder constantly "peek" at the source text while 
 
 ## Chapter 20: Quick Quizzes (Test Yourself!)
 
+![Chapter 20 Illustration](output/imagegen/chapters/chapter-20-quick-quizzes.png)
+
 ### For Kids 🎨
 
 1. **Why do we add position signals?**
@@ -6975,6 +7121,8 @@ The cross-attention lets the decoder constantly "peek" at the source text while 
 ---
 
 ## Chapter 21: Going Further
+
+![Chapter 21 Illustration](output/imagegen/chapters/chapter-21-going-further.png)
 
 ### You Did It! 🎉
 
