@@ -2,7 +2,7 @@
 
 **Building a Transformer: The Complete Guide from Paper to Production**
 
-> *A Super-Friendly Tutorial for ML Engineers AND Teens*
+> *A Super-Friendly Tutorial for Curious Learners, Students, and Practitioners*
 
 **Author:** [Rimom Costa](mailto:rimomcosta@gmail.com)
 
@@ -18,7 +18,7 @@ This is **not** your typical AI tutorial. This is a complete, from-first-princip
 **What sets this apart:**
 
 - **Hand-calculable examples** - Uses tiny numbers (6 dimensions instead of 12,288) so you can verify EVERY calculation by hand
-- **Accessible to everyone** - Explains concepts for both teens AND experienced ML engineers
+- **Accessible without being shallow** - Explains concepts clearly enough for beginners while staying useful for serious technical readers
 - **Complete coverage** - From tokenization to training to production ChatGPT (including RLHF)
 - **No magic boxes** - Every formula explained, every design choice justified
 - **Visual learning** - Analogies, examples, and intuitive explanations throughout
@@ -160,10 +160,11 @@ After completing this tutorial, you will:
 
 ## What Makes This Tutorial Unique?
 
-### 1. Dual-Level Explanations
-Every concept is explained twice:
-- **For kids:** Using analogies and simple language (dating apps, libraries, cake sharing)
-- **For engineers:** With precise mathematics and implementation details
+### 1. One Unified Explanation Style
+Every concept aims to do both jobs at once:
+- Build intuition with concrete analogies and plain language
+- Preserve the real mathematics and implementation logic
+- Avoid splitting into separate "simple" and "technical" versions
 
 ### 2. Hand-Verifiable Math
 Unlike most tutorials that use production-scale dimensions:
@@ -178,12 +179,12 @@ Most guides only show inference (using a trained model). This tutorial covers:
 
 ### 4. Real Career Guidance
 Explains what you'll ACTUALLY do in industry:
-- You DON'T train GPT-4 from scratch ($100M+ budget required)
+- You DON'T train frontier-scale models from scratch ($10M+ to much higher budgets, depending on the system)
 - You DO fine-tune existing models ($100-$1000 budget) or use techniques like ILWS (Instruction-Level Weight Shaping) for even more efficient adaptation
 - Understanding the difference is critical for career success!
 
 ### 5. Modern Content
-- Covers decoder-only transformers (GPT-style), the most popular architecture in 2024+
+- Covers decoder-only transformers (GPT-style), the most common foundation behind modern LLMs
 - Explains the three training stages that create ChatGPT
 - Includes recent optimizations (KV cache, flash attention concepts)
 
@@ -225,7 +226,7 @@ This project aims to be the **most accessible and comprehensive transformer tuto
 
 ### Testing & Feedback
 - Work through the tutorial and report confusing sections
-- Test with diverse audiences (kids, engineers, researchers)
+- Test with diverse audiences and experience levels
 - Suggest improvements to analogies and explanations
 - Verify mathematical accuracy
 
@@ -264,7 +265,9 @@ Want to help with any of these? [Open an issue](../../issues) or submit a PR!
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762) - The original transformer paper (2017)
 - [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165) - The GPT-3 paper
 - [Training language models to follow instructions with human feedback](https://arxiv.org/abs/2203.02155) - InstructGPT/ChatGPT
-- [Instruction-Level Weight Shaping (ILWS)](https://arxiv.org/abs/2509.00251) - A framework for self-improving AI agents; more efficient alternative to fine-tuning (2025)
+
+### Advanced / Emerging
+- [Instruction-Level Weight Shaping (ILWS)](https://arxiv.org/abs/2509.00251) - A newer framework for self-improving AI agents and efficient adaptation (2025)
 
 ### Complementary Tutorials
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) - Visual explanation

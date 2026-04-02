@@ -62,7 +62,7 @@ It's the most successful architecture in modern AI!
 
 **This tutorial teaches you to build a DECODER-ONLY transformer** (the GPT-style architecture). This is:
 - ✅ The architecture behind ChatGPT, Claude, LLaMA, and most modern LLMs
-- ✅ The most popular variant in 2024
+- ✅ The most common foundation behind modern text-generation LLMs
 - ✅ Used for text generation, chatbots, code completion
 - ✅ The simplest to understand (one component repeated)
 
@@ -396,7 +396,9 @@ BPE is like a smart puzzle solver. When it sees "cryptocurrency":
 If a piece still isn't in the vocabulary, break it down further:
 - "cryptocurrency" → ["crypto", "currency"] → ["crypt", "o", "cur", "ren", "cy"]
 
-In the worst case, we break down to individual letters, which are ALWAYS in our vocabulary (all 26 letters plus punctuation are included).
+**Important simplification note:** For this tutorial, we're using a **character-level mental model** because it's much easier to understand on paper. In many real GPT-style systems, tokenizers are actually **byte-level**, not letter-level. The big idea is the same: if a full word isn't available, the tokenizer keeps breaking it into smaller known pieces until it finds pieces that ARE in the vocabulary.
+
+So in our toy explanation, the worst case is "break down to characters." In many production tokenizers, the worst case is closer to "break down to bytes."
 
 Think of it like describing something using words someone knows. If a child doesn't know "automobile," you might say "auto" and "mobile" (self-moving). If they don't know "auto," you break it down further to basic concepts they do understand.
 
@@ -405,8 +407,8 @@ Think of it like describing something using words someone knows. If a child does
 Before we can use BPE, we need to create our 50,000-token vocabulary. Here's how:
 
 **Step 1: Start with basic pieces**
-Begin with just the individual characters: a, b, c, ..., z, A, B, C, ..., Z, plus space, punctuation.
-That's about 100 basic tokens.
+In our simplified tutorial version, begin with just the individual characters: a, b, c, ..., z, A, B, C, ..., Z, plus space and punctuation.
+That's about 100 basic tokens in our toy setup.
 
 **Step 2: Find the most common pair**
 Look through millions of example texts. Which two characters appear next to each other most often?
@@ -428,7 +430,9 @@ Continue this process. After many merges, you'll have common subwords:
 - Eventually full common words: "pizza", "computer", "love"
 
 **Step 6: Stop at 50,000**
-After exactly 49,900 merges (starting from 100 base characters), you've built your vocabulary of 50,000 tokens.
+In our toy setup, if you started from about 100 basic pieces, you'd need **roughly** 49,900 merges to end up near 50,000 tokens.
+
+**Production reality:** Real tokenizers often have extra reserved tokens, different starting alphabets/byte sets, and implementation details that make the exact count messier. The important idea is NOT the exact arithmetic. The important idea is: keep merging common pairs until you reach your target vocabulary size.
 
 **The beautiful result:** Common words are single tokens (efficient!), while rare words are broken into meaningful pieces (flexible!).
 
@@ -439,7 +443,7 @@ Subword level:   "th", "ing", "er"
 Word level:      "the", "pizza", "love"
 ```
 
-**Why this works:** Language has patterns. The letters "th" appear together constantly in English, so they deserve their own token. But "qz" almost never appear together, so we don't waste a token on that combination. BPE automatically discovers these patterns from data.
+**Why this works:** Language has patterns. The character pair "th" appears together constantly in English, so it deserves its own token in our simplified example. But "qz" almost never appears together, so we don't waste a token on that combination. In a production tokenizer, the same principle applies even if the smallest units are bytes instead of letters.
 
 **Deterministic and reversible:** Once we've built our vocabulary, tokenization is completely deterministic—the same text always produces the same tokens. And we can always convert tokens back to text perfectly (unlike lossy compression). It's a two-way mapping.
 
@@ -2081,11 +2085,11 @@ Three positions aren't enough to really SEE the beautiful pattern. Let's calcula
 
 Try picking any two rows — they're always different. That's how the model knows position 3 is not position 7, even though both are just "somewhere in the middle."
 
-### Step 2: Combining with Word Embeddings
+## Part 6: Combining Position with Word Meaning
 
 ![Embedding Plus Position Diagram](output/explainers/embedding-plus-position-specific.svg)
 
-Now comes the crucial part: we need to COMBINE the position information with the word meaning!
+Now comes the crucial part: we need to COMBINE the position information with the word meaning.
 
 **Recall from Chapter 3**, our word embeddings are:
 ```
@@ -2094,64 +2098,16 @@ Now comes the crucial part: we need to COMBINE the position information with the
 "pizza": [0.90, -0.10, -0.20, -0.80, 0.50, 0.75]
 ```
 
-These capture the MEANING of each word (learned from training data).
+These capture the MEANING of each word.
 
-**Now we have position encodings:**
+**And from Part 5, we now have position encodings:**
 ```
 Position 0: [0.00, 1.00, 0.00, 1.00, 0.00, 1.00]
 Position 1: [0.84, 0.54, 0.05, 1.00, 0.00, 1.00]
 Position 2: [0.91, -0.42, 0.09, 1.00, 0.00, 1.00]
 ```
 
-### Seeing the Pattern: Let's Look at More Positions!
-
-Three positions aren't enough to really SEE the beautiful pattern. Let's calculate positions 0 through 9 (imagine a 10-word sentence) so you can watch the waves dance!
-
-**Position Encoding Table** (rounded for clarity):
-
-| Position | dim<sub>0</sub>  | dim<sub>1</sub>  | dim<sub>2</sub>  | dim<sub>3</sub>  | dim<sub>4</sub>  | dim<sub>5</sub>  |
-|----------|-------|-------|-------|-------|-------|-------|
-| 0        | 0.00  | 1.00  | 0.00  | 1.00  | 0.00  | 1.00  |
-| 1        | 0.84  | 0.54  | 0.05  | 1.00  | 0.00  | 1.00  |
-| 2        | 0.91  | -0.42 | 0.09  | 1.00  | 0.00  | 1.00  |
-| 3        | 0.14  | -0.99 | 0.14  | 0.99  | 0.01  | 1.00  |
-| 4        | -0.76 | -0.65 | 0.19  | 0.98  | 0.01  | 1.00  |
-| 5        | -0.96 | 0.28  | 0.23  | 0.97  | 0.01  | 1.00  |
-| 6        | -0.28 | 0.96  | 0.28  | 0.96  | 0.01  | 1.00  |
-| 7        | 0.66  | 0.75  | 0.32  | 0.95  | 0.02  | 1.00  |
-| 8        | 0.99  | -0.15 | 0.37  | 0.93  | 0.02  | 1.00  |
-| 9        | 0.41  | -0.91 | 0.42  | 0.91  | 0.02  | 1.00  |
-
-**Now look at the patterns!**
-
-**Dimensions 0 & 1 (Very Fast ⚡⚡⚡):**
-- Change dramatically with every position!
-- Position 0: [0.00, 1.00]
-- Position 1: [0.84, 0.54] — totally different!
-- Position 2: [0.91, -0.42] — different again!
-- They wiggle up and down: positive, negative, positive, negative...
-
-**Dimensions 2 & 3 (Medium 🐇):**
-- Change gradually
-- Position 0: [0.00, 1.00]
-- Position 5: [0.23, 0.97] — small shift
-- Position 9: [0.42, 0.91] — noticeable but gentle
-
-**Dimensions 4 & 5 (Slow 🐢):**
-- Barely move at all for these early positions!
-- Position 0: [0.00, 1.00]
-- Position 9: [0.02, 1.00] — almost identical!
-- These would become useful for distinguishing position 100 vs position 200
-
-**The magic:** Each row is COMPLETELY UNIQUE! No two positions share the same 6-number pattern. It's like each position has its own special fingerprint!
-
-Try picking any two rows — they're always different. That's how the model knows position 3 is not position 7.
-
----
-
-## Part 6: Combining Position with Word Meaning
-
-These capture the POSITION of each word (computed from formula).
+These capture the POSITION of each word.
 
 **How do we combine them?** Simple element-wise addition!
 
@@ -2368,7 +2324,7 @@ Before moving on, make sure you understand:
 While we use sinusoidal encodings in this tutorial, modern transformers experiment with alternatives:
 
 - **Learned positional embeddings:** Learn positions like word embeddings (simpler but can't extrapolate beyond training length)
-- **RoPE (Rotary Position Embedding):** Encodes position by rotating embeddings (used in LLaMA, GPT-NeoX)
+- **RoPE (Rotary Position Embedding):** Encodes position by rotating embeddings instead of adding a separate position vector. This makes relative distances between words easier for the model to track (used in LLaMA, GPT-NeoX)
 - **ALiBi (Attention with Linear Biases):** Adds position info directly to attention scores (simpler, very effective)
 
 Each has trade-offs, but sinusoidal encoding remains elegant and effective for understanding the core concepts!
@@ -2420,7 +2376,7 @@ is the rotation matrix for offset $k$!
 
 **This is why sine/cosine isn't just a "clever trick"—it's a principled mathematical solution!** Other functions (like polynomials or exponentials) don't have this property. Sine and cosine are special because of these trigonometric identities.
 
-**For ML engineers:** This is the insight that makes sinusoidal encodings not just "working in practice" but "elegant in theory." It's why they were chosen in the original "Attention Is All You Need" paper, beyond just being bounded and unique.
+This is the insight that makes sinusoidal encodings not just "working in practice" but "elegant in theory." It's why they were chosen in the original "Attention Is All You Need" paper, beyond just being bounded and unique.
 
 **Don't worry if this seems advanced!** You don't NEED to understand this to use transformers effectively. It's mathematical icing on the cake—interesting for those who want to go deeper!
 
@@ -2492,6 +2448,8 @@ Attention allows each word to gather this contextual information!
 - "delicious" and "homemade" need to know they're modifying "pizza"
 
 Without attention, these words are isolated islands. With attention, they form a connected understanding!
+
+> **Author's note:** In this chapter, we're temporarily letting words look across the whole sentence so you can understand how attention works mathematically. In **Chapter 12**, we'll add **causal masking**, which is the decoder-only rule that prevents a token from looking into the future.
 
 ### The Dating App Analogy (Understanding Weighted Attention)
 
@@ -2838,7 +2796,7 @@ Each camera has a different perspective. The final news segment combines all per
 - ✓ Still combines into one coherent representation
 - ✓ Parallelizable (all heads compute simultaneously)
 
-**🎓 Computational Efficiency Note (For Engineers):**
+**🎓 Computational Efficiency Note:**
 
 An important detail: Having $h=2$ heads of size $d_k=3$ (total 6 dimensions) uses roughly the SAME computation and parameters as having 1 head of size 6!
 
@@ -2861,6 +2819,8 @@ This is why having 96 heads in GPT-3 doesn't make it 96× slower than having 1 h
 ## Part 3: The Mathematics (Step-by-Step Calculations)
 
 Now let's compute everything with actual numbers! We'll focus on **Head 1** and show complete calculations. Head 2 works identically but with dimensions [3,4,5].
+
+**Reading tip:** If you want the intuition first, you can skim the raw arithmetic, look at the final numbers and diagrams, and then come back with a calculator. The point of this section is that every step is checkable, not that you must do every multiplication in one sitting.
 
 ### Step 1: Understand the Weight Matrices
 
@@ -2936,6 +2896,8 @@ Query calculation:
 \end{align}
 ```
 
+**Why do we divide by $(1-\beta_1^t)$ and $(1-\beta_2^t)$?** Because Adam starts both moving averages at zero. That makes the early $m$ and $v$ values artificially too small. The bias-correction terms "warm them up" so the first few optimization steps aren't misleadingly tiny.
+
 Key calculation:
 ```math
 \begin{align}
@@ -2948,13 +2910,15 @@ Key calculation:
 Value calculation:
 ```math
 \begin{align}
-\mathbf{K}_I &= [0.01, 0.80, 0.30] \times \mathbf{W}^V_1 \\
+\mathbf{V}_I &= [0.01, 0.80, 0.30] \times \mathbf{W}^V_1 \\
 &= [0.003 - 0.16 + 0.03, 0.001 + 0.24 - 0.03, 0.002 + 0.08 + 0.09] \\
 &= [-0.127, 0.211, 0.172]
 \end{align}
 ```
 
 **For "love" $[0.44, 1.14, 0.05]$:**
+
+Using the same multiply-and-add method as above:
 
 $$
 \begin{align}
@@ -2973,7 +2937,7 @@ $$\mathbf{Q}_{\text{pizza}} = [0.362 - 0.052 + 0.033, 0.543 + 0.104 - 0.011, -0.
 
 $$\mathbf{K}_{\text{pizza}} = [0.181 - 0.104 - 0.044, -0.362 - 0.156 - 0.011, 0.543 + 0.052 - 0.022] = [0.033, -0.529, 0.573]$$
 
-$$\mathbf{V}_{\text{pizza}} = [0.543 + 0.104 - 0.011, 0.181 - 0.156 + 0.011, 0.181 + 0.052 - 0.033] = [0.636, 0.036, 0.200]$$
+$$\mathbf{V}_{\text{pizza}} = [0.543 + 0.104 - 0.011, 0.181 - 0.156 + 0.011, 0.362 - 0.052 - 0.033] = [0.636, 0.036, 0.277]$$
 
 ---
 
@@ -3335,11 +3299,11 @@ $$
 \text{Output}_I &= 0.3107 \times \mathbf{V}_I + 0.3140 \times \mathbf{V}_{\text{love}} + 0.3753 \times \mathbf{V}_{\text{pizza}} \\
 &= 0.3107 \times [-0.127, 0.211, 0.172] \\
 &\quad + 0.3140 \times [-0.091, 0.381, -0.055] \\
-&\quad + 0.3753 \times [0.636, 0.036, 0.200] \\
+&\quad + 0.3753 \times [0.636, 0.036, 0.277] \\
 &= [-0.0395, 0.0656, 0.0534] \\
 &\quad + [-0.0286, 0.1196, -0.0173] \\
-&\quad + [0.2387, 0.0135, 0.0751] \\
-&= [0.1706, 0.1987, 0.1112]
+&\quad + [0.2387, 0.0135, 0.1040] \\
+&= [0.1706, 0.1987, 0.1401]
 \end{align}
 $$
 
@@ -3347,7 +3311,7 @@ This is the **Head 1 output for "I"**—a 3D vector capturing what "I" learned f
 
 ### Complete Head 2 (Quick Version)
 
-Head 2 works identically but uses dimensions [3, 4, 5] and different weight matrices. Let's say after calculation:
+Head 2 works identically but uses dimensions [3, 4, 5] and different weight matrices. To keep the chapter from turning into a giant slab of arithmetic, I'll summarize the final result here. If you want, you can treat Head 2 as a perfect calculator exercise using the same exact method:
 
 $$\text{Head 2 output for "I"} = [0.245, -0.089, 0.156]$$
 
@@ -4143,7 +4107,7 @@ The depth of a transformer (how many identical blocks we stack) is crucial to it
 - GPT-2 Large: 36 layers (774M parameters)
 - GPT-2 XL: 48 layers (1.5B parameters)
 - GPT-3: 96 layers (175B parameters)
-- GPT-4: ~120 layers estimated (1.7T parameters estimated)
+- GPT-4: architecture not publicly disclosed, but widely believed to be significantly larger and more complex than GPT-3
 
 ### The Abstraction Ladder: From Letters to Meaning
 
@@ -4319,11 +4283,13 @@ This means the output vocabulary matrix is just the transpose of the input embed
 
 Input embedding lookup: row 999 of $\mathbf{E}$ gives us the vector for "pizza"
 
-Output scoring: We compute dot product of our final hidden state with each row of $\mathbf{W}\_{\text{vocab}}$. If $\mathbf{W}\_{\text{vocab}} = \mathbf{E}^T$, then each column of $\mathbf{W}_{\text{vocab}}$ is a word's embedding. The dot product measures: "How similar is my current state to the embedding of word X?"
+Output scoring: We compute a dot product between our final hidden state and **each column** of $\mathbf{W}_{\text{vocab}}$. Since $\mathbf{W}_{\text{vocab}}$ has shape $6 \times 50000$, each column corresponds to one vocabulary token.
+
+If $\mathbf{W}\_{\text{vocab}} = \mathbf{E}^T$, then each column of $\mathbf{W}_{\text{vocab}}$ is exactly one word embedding from the input table, just transposed into output form. The dot product measures: "How similar is my current state to the embedding of word X?"
 
 Words whose embeddings are similar to the final hidden state get high scores—they're likely next words!
 
-Not all transformers use weight tying (BERT doesn't, for example), but it's common in autoregressive models like GPT.
+Weight tying is common, but not universal. Different model families make different trade-offs between parameter efficiency and flexibility.
 
 Final vector for "pizza" position: $[0.71, -0.23, 0.84, 0.45, -0.12, 0.56]$
 
@@ -4353,6 +4319,9 @@ Apply softmax over all 50,000 logits:
 $$P(\text{token } i) = \frac{e^{\text{logit}_i}}{\sum_{j=1}^{50000} e^{\text{logit}_j}}$$
 
 **Calculation example:**
+
+To keep this **paper-doable**, let's temporarily pretend our vocabulary only contains these six example tokens. In the real model, we'd sum across all 50,000 logits. But on paper, that's impossible and not useful. So we'll do a tiny toy softmax you can actually verify by hand.
+
 ```math
 \begin{align}
 e^{-2.3} &= 0.100 \\
@@ -4365,18 +4334,25 @@ e^{4.7} &= 109.947 \\
 \end{align}
 ```
 
-Sum ≈ 500 (simplified from summing all 50,000 exponentials)
+Now sum JUST these six toy values:
+
+$$
+\text{sum} = 0.100 + 6.050 + 1.649 + 24.533 + 8.166 + 109.947 = 150.445
+$$
 
 **Probabilities:**
 ```
-P("I") = 0.100/500 = 0.0002 (0.02%)
-P("love") = 6.050/500 = 0.0121 (1.21%)
-P("pizza") = 1.649/500 = 0.0033 (0.33%)
-P("the") = 24.533/500 = 0.0491 (4.91%)
-P("cat") = 8.166/500 = 0.0163 (1.63%)
-P("is") = 109.947/500 = 0.2199 (21.99%)
-...
+P("I") = 0.100 / 150.445 = 0.0007 (0.07%)
+P("love") = 6.050 / 150.445 = 0.0402 (4.02%)
+P("pizza") = 1.649 / 150.445 = 0.0110 (1.10%)
+P("the") = 24.533 / 150.445 = 0.1631 (16.31%)
+P("cat") = 8.166 / 150.445 = 0.0543 (5.43%)
+P("is") = 109.947 / 150.445 = 0.7307 (73.07%)
 ```
+
+These six probabilities now sum to 100% (up to rounding), so you can check the arithmetic on paper.
+
+**Production note:** In a real 50,000-word model, we'd do the same operation over the full vocabulary. The math is identical. The only thing we're shrinking here is the number of tokens so the example stays human-computable.
 
 The model predicts "is" with highest probability (21.99%)!
 
@@ -4716,7 +4692,9 @@ Cross-entropy has several mathematical properties that make it perfect for train
 
 3. **Differentiable everywhere:** We can compute gradients at any point, which is essential for backpropagation. The gradient gives us a direction to improve.
 
-4. **Convex optimization landscape:** For the final softmax layer, cross-entropy creates a "bowl-shaped" error surface with a single global minimum. No local minima to get stuck in at this layer.
+4. **Well-behaved at the prediction layer:** For a fixed set of logits, cross-entropy gives clean gradients that push probability mass toward the correct answer. That's exactly what we want at the prediction step.
+
+**Important nuance:** Once this loss is composed with a deep transformer full of learned weights, the overall training problem is still **non-convex**. So training a real transformer is NOT a simple single-bowl optimization problem. Cross-entropy helps, but it doesn't magically make deep learning easy.
 
 Think of it like a grading system that's tough but fair. If you guess "The cat eats cars" (nonsensical), you get a huge penalty. If you guess "The cat eats mice" (reasonable but not the exact answer "fish"), you get a smaller penalty. If you guess "The cat eats fish" (exact match), you get almost no penalty. The scoring system naturally teaches you to make sensible predictions.
 
@@ -5310,7 +5288,7 @@ Continue until:
 | Dropout ON (0.1) | Dropout OFF |
 | Causal mask ON | Causal mask ON (still needed!) |
 | Batch size 32+ | Batch size 1-8 (user queries) |
-| Both directions | Left-to-right only |
+| Left-to-right causal, but many positions processed in parallel | Left-to-right causal, usually one next-token step at a time |
 | Update weights | Frozen weights |
 | Compute gradients | No gradients |
 
@@ -5320,6 +5298,8 @@ Continue until:
 ![KV Cache Reuse Diagram](output/explainers/kv-cache-reuse.svg)
 
 **This isn't just an "optimization"—it's the fundamental mechanism that makes autoregressive generation computationally feasible!** Without it, ChatGPT would be 50-100× slower!
+
+**Important clarification:** KV cache is an **inference-time** trick. We use it during generation, when the model is producing tokens one by one. We do **not** use KV cache during standard training, where we process full sequences in parallel and run backpropagation across the whole batch.
 
 ### The Recomputation Disaster
 
@@ -5449,8 +5429,8 @@ At 32-bit floats (4 bytes each): $2.36M \times 4 = 9.4$ MB per token
 
 **This is why context limits exist:**
 - GPT-3: 2048 tokens (fits in 80GB GPU)
-- GPT-4: 32K tokens (needs multiple GPUs or very large memory)
-- Claude: 200K tokens (requires special distributed memory systems!)
+- Some modern systems: tens of thousands of tokens
+- Some frontier systems: hundreds of thousands of tokens, but only with substantial memory engineering
 
 **The memory wall:**
 ```
@@ -5460,7 +5440,7 @@ Token 100:  940 MB (~1 GB)
 Token 1000: 9.4 GB
 Token 2048: 19.3 GB ← GPT-3 limit!
 Token 10000: 94 GB ← Needs special hardware!
-Token 100000: 940 GB ← Claude 3 scale, needs distributed systems!
+Token 100000: 940 GB ← frontier-scale context windows need serious engineering
 ```
 
 **The limiting factor for context length is NOT the math (positional encoding works for any length), it's the MEMORY needed to cache Keys and Values!**
@@ -5471,10 +5451,12 @@ Token 100000: 940 GB ← Claude 3 scale, needs distributed systems!
 - The model literally runs out of memory to remember everything!
 
 **Recent innovations solving this:**
-- FlashAttention: More memory-efficient attention computation
+- FlashAttention: More memory-efficient attention computation, especially for handling the big attention matrix during training and long-context processing
 - Sparse attention: Don't attend to every token
 - Sliding window attention: Only remember last N tokens
 - Compression: Summarize old context into fewer tokens
+
+**Quick distinction:** FlashAttention and KV cache solve DIFFERENT bottlenecks. FlashAttention helps when attention over many tokens becomes memory-heavy. KV cache helps when autoregressive generation would otherwise keep recomputing the same old keys and values.
 
 ---
 
@@ -5538,14 +5520,13 @@ These control the MODEL SIZE and STRUCTURE:
 - Our tutorial: 50,000
 - GPT-2: 50,257
 - GPT-3: 50,257
-- Claude: ~100,000
+- Some frontier tokenizers: on the order of 100,000 tokens
 - Effect: More tokens = better rare word handling, larger embedding matrix
 
 **6. Context length (max sequence)**
 - GPT-2: 1024
 - GPT-3: 2048
-- GPT-4: 8K-32K (varies)
-- Claude: Up to 200K
+- Modern frontier models: ranges from thousands to hundreds of thousands of tokens, depending on the system
 - Effect: Longer = more context, quadratically more memory
 
 ### Training Hyperparameters
@@ -6446,12 +6427,14 @@ Let's trace how ChatGPT was actually made:
 
 **The world discovers:** "Wow, AI can actually help me with tasks!"
 
-### 2023-2024: GPT-4, Claude 3, Gemini (Modern Era)
+### 2023 Onward: GPT-4, Claude, Gemini, and the Modern Era
 
-**Everyone follows the three-stage pattern:**
+**A useful simplified picture is that many modern systems follow something LIKE this three-stage pattern:**
 - Pre-train massive base models
 - Instruction tune
 - RLHF to align with human values
+
+**Reality check:** Modern assistants can add extra techniques on top of this, like constitutional AI, DPO-style preference optimization, or more elaborate alignment pipelines. So think of the three stages as the core mental model, not the only exact recipe used in the wild.
 
 **Result:** Today's helpful AI assistants!
 
@@ -6883,7 +6866,7 @@ Modern trend: **Decoder-only is winning** because:
 1. Simpler = easier to train massive models
 2. One architecture = one codebase
 3. Prompting is flexible enough for most tasks
-4. Scales better (GPT-4 has ~1.7 trillion parameters!)
+4. Scales well to very large models (modern frontier LLMs are enormous, though companies often don't disclose the exact parameter counts)
 
 ---
 
@@ -6975,20 +6958,20 @@ The cross-attention lets the decoder constantly "peek" at the source text while 
 
 ### The Popularity Contest
 
-**Decoder-Only (GPT-style) is dominating in 2024:**
+**Decoder-Only (GPT-style) is the dominant pattern in today's frontier LLM landscape:**
 
 **OpenAI:**
-- GPT-3, GPT-3.5, GPT-4: Decoder-only
+- GPT-3, GPT-3.5, and GPT-4-class systems: Decoder-only
 - Used by ChatGPT, GitHub Copilot
 
 **Meta (Facebook):**
 - LLaMA, LLaMA 2, LLaMA 3: Decoder-only
 
 **Anthropic:**
-- Claude, Claude 2, Claude 3: Decoder-only
+- Claude-family systems: Decoder-only
 
 **Google:**
-- PaLM, PaLM 2, Gemini: Decoder-only (mostly)
+- PaLM-family and Gemini-family systems rely heavily on decoder-style language model foundations in many major LLM deployments
 
 **Why the shift?**
 1. **Simpler to scale:** One architecture scales cleanly
@@ -7017,7 +7000,7 @@ The cross-attention lets the decoder constantly "peek" at the source text while 
 
 **You learned the DECODER-ONLY architecture (GPT-style)**, which is:
 
-✅ **The most popular architecture today** (GPT-4, Claude, LLaMA)
+✅ **The most popular architecture today** (GPT-class, Claude-class, and LLaMA-class systems)
 ✅ **The most general-purpose** (can do generation + understanding)
 ✅ **The simplest to understand** (one component type, repeated)
 ✅ **The most scalable** (easiest to train at massive scale)
@@ -7056,7 +7039,7 @@ The cross-attention lets the decoder constantly "peek" at the source text while 
 - Writes target step-by-step (decoder)
 - Best for transforming content
 
-**You learned the writer (decoder)** - the most versatile and popular in 2024!
+**You learned the writer (decoder)** - the most versatile and widely used pattern in modern LLMs.
 
 ---
 
@@ -7064,59 +7047,43 @@ The cross-attention lets the decoder constantly "peek" at the source text while 
 
 ![Chapter 20 Illustration](output/imagegen/chapters/chapter-20-quick-quizzes.png)
 
-### For Kids 🎨
+### Quick Check
 
 1. **Why do we add position signals?**
-   - So the model knows "I love pizza" ≠ "pizza love I"
+   - So the model knows "I love pizza" is different from "pizza love I."
 
 2. **What's attention like?**
-   - Friends whispering secrets—you listen more to the interesting ones!
+   - A word looking around the sentence and listening most closely to the words that matter most.
 
-3. **Why residual connections?**
-   - Like echoing—keeps your voice loud even in a long hallway
+3. **Why do residual connections help?**
+   - They preserve the original signal and give gradients a direct path backward through deep stacks.
 
 4. **What does dropout do?**
-   - Randomly "closes ears" so you learn to solve problems alone
+   - It randomly removes some pathways during training so the model learns more robust patterns instead of relying too heavily on one path.
 
 5. **What's softmax?**
-   - Sharing a cake fairly based on how much everyone helped
+   - It turns raw scores into a probability distribution that adds up to 100%.
 
-### For Engineers 🔧
+6. **Why scale attention by $\sqrt{d_k}$?**
+   - To keep dot products from getting too large and making softmax overly extreme.
 
-1. **Why scale attention by $\sqrt{d_k}$?**
-   - Prevents variance explosion; maintains stable gradients in softmax
+7. **What's the computational complexity of self-attention?**
+   - Roughly $O(n^2 d)$, where $n$ is sequence length and $d$ is dimension.
 
-2. **What's the computational complexity of self-attention?**
-   - $O(n^2 d)$ where $n$ = sequence length, $d$ = dimension
+8. **Which transformer architecture did we learn?**
+   - Decoder-only (GPT-style), used for text generation, chatbots, and code completion.
 
-3. **How do residual connections help deep networks?**
-   - Provide gradient highway (identity mapping), prevent vanishing gradients
+9. **What's the main difference between encoder and decoder?**
+   - Encoders can see the full input at once; decoders only see the past and generate step by step.
 
-4. **Why is LayerNorm better than BatchNorm for transformers?**
-   - Sequence lengths vary; per-sample normalization more stable
+10. **What's the difference between pre-training and fine-tuning?**
+    - Pre-training builds general language ability; fine-tuning adapts that ability to a specific task or domain.
 
-5. **What's the purpose of multi-head attention?**
-   - Multiple representation subspaces; capture different relationship types
+11. **How is ChatGPT different from a base GPT model?**
+    - ChatGPT adds instruction tuning and alignment training so it follows requests and behaves more helpfully.
 
-6. **Which transformer architecture did we learn?**
-   - Decoder-only (like GPT)! Used for text generation, chatbots, code completion
-
-7. **What's the main difference between encoder and decoder?**
-   - Encoder: can see all words (bidirectional), for understanding/classification
-   - Decoder: can only see past words (causal), for generation
-
-8. **When would you use encoder-decoder instead of decoder-only?**
-   - Translation, summarization - when you need to fully understand input before generating different output
-
-9. **What's the difference between pre-training and fine-tuning?**
-   - Pre-training: Train on ALL internet text (expensive, done by big labs)
-   - Fine-tuning: Adapt pre-trained model to specific task (cheap, this is what YOU'LL do!)
-
-10. **How is ChatGPT different from base GPT-3?**
-    - ChatGPT = GPT-3 + Instruction Tuning + RLHF (learns to follow instructions and be helpful)
-
-11. **Do you need millions of dollars to use transformers for your project?**
-    - NO! Download pre-trained models (free) and fine-tune for $100-$1000. Pre-training is expensive, but YOU fine-tune!
+12. **Do you need millions of dollars to use transformers for your project?**
+    - No. Training frontier models from scratch is expensive, but using or adapting existing models is much more accessible.
 
 ---
 
@@ -7168,32 +7135,23 @@ You started this journey knowing transformers were "some AI thing." Now you unde
 
 ### Next Steps
 
-**For Kids:**
-1. Draw your own transformer comic—words with speech bubbles!
-2. Try the "next word game" with friends
-3. Learn basic Python to code this up
-
-**For Engineers:**
-1. **Code it:** Implement in PyTorch/TensorFlow
-2. **Read papers:** 
+1. **Play with the ideas:** Try the "next word" game with friends, or sketch your own transformer comic with words passing signals to each other.
+2. **Code it:** Implement a mini version in PyTorch or TensorFlow once you're comfortable with the math.
+3. **Read the original papers:**
    - "Attention Is All You Need" (Vaswani et al., 2017)
    - "Language Models are Few-Shot Learners" (GPT-3)
    - "Training Compute-Optimal Large Language Models" (Chinchilla)
-3. **Experiment:**
-   - Train a mini GPT on Wikipedia
-   - Try different architectures (sparse attention, mixture of experts)
-   - Fine-tune existing models (Hugging Face)
-4. **Explore other transformer architectures:**
-   - **BERT** (encoder-only) - For classification and understanding tasks
-     - Great for: Sentiment analysis, named entity recognition, question answering
-     - Paper: "BERT: Pre-training of Deep Bidirectional Transformers"
-   - **T5** (encoder-decoder) - For transformation tasks
-     - Great for: Translation, summarization, text-to-text tasks
-     - Paper: "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer"
-   - **Vision Transformers (ViT)** - Transformers for images!
-   - **Diffusion Transformers** - For image/video generation (like Sora)
-   
-   **Remember:** You learned decoder-only (GPT-style), which is the most popular! Understanding BERT and T5 is now easy since you know the fundamentals!
+4. **Experiment:**
+   - Train a mini GPT on a small dataset
+   - Try sparse attention or mixture-of-experts variants
+   - Fine-tune existing models with Hugging Face
+5. **Explore other transformer families:**
+   - **BERT** (encoder-only) for classification and understanding tasks
+   - **T5** (encoder-decoder) for transformation tasks like translation and summarization
+   - **Vision Transformers (ViT)** for images
+   - **Diffusion Transformers** for image and video generation
+
+**Remember:** You learned the decoder-only foundation. Once that clicks, the other transformer families become much easier to understand.
 
 ### Resources
 
