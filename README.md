@@ -180,7 +180,7 @@ Most guides only show inference (using a trained model). This tutorial covers:
 ### 4. Real Career Guidance
 Explains what you'll ACTUALLY do in industry:
 - You DON'T train frontier-scale models from scratch ($10M+ to much higher budgets, depending on the system)
-- You DO fine-tune existing models ($100-$1000 budget) or use techniques like ILWS (Instruction-Level Weight Shaping) for even more efficient adaptation
+- You DO fine-tune existing models ($100-$1000 budget) or use other efficient adaptation techniques when appropriate
 - Understanding the difference is critical for career success!
 
 ### 5. Modern Content

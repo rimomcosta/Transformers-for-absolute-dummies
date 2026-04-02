@@ -1,10 +1,10 @@
 # Building a Transformer: The Complete Guide from Paper to Production
 
-**A Super-Friendly Tutorial for ML Engineers AND Teens**
+**A Super-Friendly Tutorial for Curious Learners, Students, and Practitioners**
 
 **Author:** Rimom Costa ([rimomcosta@gmail.com](mailto:rimomcosta@gmail.com))
 
-Hey there! 👋 Grab your pencil, paper, and maybe some crayons—we're building a transformer from absolute scratch, the same architecture powering ChatGPT and Claude. We'll use tiny numbers (6 dimensions instead of thousands) so you can calculate EVERYTHING by hand. No scary code, no giant computers—just you, me, and some really cool math.
+Hey there! 👋 Grab your pencil, paper, and maybe some crayons—we're building a transformer from absolute scratch, using the same core ideas that power systems like ChatGPT and Claude. We'll use tiny numbers (6 dimensions instead of thousands) so you can calculate EVERYTHING by hand. No scary code, no giant computers—just you, me, and some really cool math.
 
 **What makes this tutorial special?** We'll walk through training (how the model learns) AND inference (how it predicts after training), with every single number calculated step-by-step. Ready? Let's go!
 
@@ -324,11 +324,11 @@ Let's build a vocabulary of **50,000 tokens**. Why exactly 50,000?
 
 First, understand that a "token" can be a whole word, part of a word, or even a single letter. The number 50,000 is a sweet spot:
 
-- **Too few tokens (e.g., 10,000):** Many words wouldn't fit, so we'd break everything into tiny pieces. "Unbelievable" might become "un", "be", "liev", "able"—harder for the model to understand
+- **Too few tokens (e.g., 10,000):** Many words wouldn't fit, so we'd break everything into tiny pieces. "Unbelievable" might become "un", "believ", "able"—harder for the model to understand
 - **Too many tokens (e.g., 500,000):** We'd have a word for everything, but it creates a HUGE lookup table that's expensive to store and search through
 - **50,000 is just right:** Covers most common English words plus frequent subwords, without being wasteful
 
-Real systems use similar sizes: GPT-3 uses 50,257, Claude uses ~100,000 (handles more languages).
+Real systems use similar sizes: GPT-3 uses 50,257, and some frontier systems use vocabularies on the order of 100,000 tokens.
 
 Here's what our vocabulary looks like:
 
@@ -1575,7 +1575,7 @@ When you see $\sin(1)$, it means "sine of 1 radian" (about 57 degrees), not "sin
 
 ### Sine Wave: Seeing the Full Pattern
 
-Let's see actual numbers (you don't need to know how to calculate these—just observe the pattern):
+Let's see actual numbers (you don't need to know how to calculate these—just observe the pattern). **All values below are rounded to 2 decimal places**, so when you see 1.00 or -1.00, read that as "very close to the peak or valley," not necessarily mathematically exact.
 
 ```
 Input angle → Sine output
@@ -1583,14 +1583,14 @@ Input angle → Sine output
 0.0   →   0.00   ← Starting point (middle of wave)
 0.5   →   0.48   ← Rising...
 1.0   →   0.84   ← Still rising...
-1.5   →   1.00   ← Peak! (maximum)
+1.5   →   1.00   ← Near the peak
 2.0   →   0.91   ← Coming back down...
 2.5   →   0.60   ← Still descending...
 3.0   →   0.14   ← Almost at middle...
 3.5   →  -0.35   ← Crossed to negative!
 4.0   →  -0.76   ← Going deeper...
 4.5   →  -0.98   ← Almost at bottom...
-5.0   →  -0.96   ← Valley! (close to minimum)
+5.0   →  -0.96   ← Near the valley
 5.5   →  -0.71   ← Rising back up...
 6.0   →  -0.28   ← Still rising...
 6.5   →   0.22   ← Crossed back to positive!
@@ -1602,7 +1602,7 @@ Input angle → Sine output
 9.5   →  -0.08   ← Crossing to negative...
 10.0  →  -0.54   ← Negative again...
 10.5  →  -0.88   ← Going down...
-11.0  →  -1.00   ← Bottom of the wave! (minimum)
+11.0  →  -1.00   ← Very near the bottom of the wave
 11.5  →  -0.88   ← Rising back up...
 12.0  →  -0.54   ← Still rising...
 12.5  →  -0.05   ← Almost back to zero...
@@ -1626,7 +1626,7 @@ It takes about 6.28 units (called "2π" in math) to complete one full cycle, the
 
 ### Cosine Wave: Sine's Twin
 
-Cosine is almost identical to sine, just **starts at a different point in the cycle**:
+Cosine is almost identical to sine, just **starts at a different point in the cycle**. Again, the table below is rounded to 2 decimal places:
 
 ```
 Input angle → Cosine output
@@ -1637,7 +1637,7 @@ Input angle → Cosine output
 1.5   →   0.07   ← Almost at middle...
 2.0   →  -0.42   ← Crossed to negative!
 2.5   →  -0.80   ← Going deeper...
-3.0   →  -0.99   ← Valley! (close to minimum)
+3.0   →  -0.99   ← Near the valley
 3.5   →  -0.94   ← Rising back up...
 4.0   →  -0.65   ← Still rising...
 4.5   →  -0.21   ← Almost at middle...
@@ -1653,7 +1653,7 @@ Input angle → Cosine output
 9.5   →  -0.99   ← Almost at valley...
 10.0  →  -0.84   ← Rising back up...
 10.5  →  -0.53   ← Still rising...
-11.0  →  -0.00   ← Crossed to positive! (back at middle)
+11.0  →  -0.00   ← Very close to the middle again
 11.5  →   0.53   ← Climbing...
 12.0  →   0.84   ← Rising...
 12.5  →   0.99   ← Almost at peak again...
@@ -2896,8 +2896,6 @@ Query calculation:
 \end{align}
 ```
 
-**Why do we divide by $(1-\beta_1^t)$ and $(1-\beta_2^t)$?** Because Adam starts both moving averages at zero. That makes the early $m$ and $v$ values artificially too small. The bias-correction terms "warm them up" so the first few optimization steps aren't misleadingly tiny.
-
 Key calculation:
 ```math
 \begin{align}
@@ -3322,7 +3320,7 @@ $$\text{Head 2 output for "I"} = [0.245, -0.089, 0.156]$$
 Stick both head outputs together:
 
 $$
-\text{Concatenated output for "I"} = [0.1706, 0.1987, 0.1112, 0.245, -0.089, 0.156]
+\text{Concatenated output for "I"} = [0.1706, 0.1987, 0.1401, 0.245, -0.089, 0.156]
 $$
 
 Back to 6 dimensions, but now with multi-perspective understanding!
@@ -3652,14 +3650,14 @@ h_2 &= [0.25, -0.31, 0.42, 0.18, -0.09, 0.33] \cdot [-0.2, 0.3, 0.1, -0.15, 0.25
 $$
 
 For hidden neuron $h_3$:
-$$h_3 = [0.25, -0.31, 0.42, 0.18, -0.09, 0.33] \cdot [0.3, -0.1, 0.2, 0.1, -0.2, 0.3] + 0.2 = 0.294$$
+$$h_3 = [0.25, -0.31, 0.42, 0.18, -0.09, 0.33] \cdot [0.3, -0.1, 0.2, 0.1, -0.2, 0.3] + 0.2$$
 
 For hidden neuron $h_4$:
-$$h_4 = [0.25, -0.31, 0.42, 0.18, -0.09, 0.33] \cdot [0.15, 0.25, -0.15, 0.2, 0.1, -0.1] + 0.15 = 0.0775$$
+$$h_4 = [0.25, -0.31, 0.42, 0.18, -0.09, 0.33] \cdot [0.15, 0.25, -0.15, 0.2, 0.1, -0.1] + 0.15$$
 
-Continuing this process for all 24 neurons (we'll abbreviate the rest):
+Continuing this process for all 24 neurons (we'll abbreviate the rest rather than dump 24 nearly identical dot products):
 
-$$\text{Hidden layer} = [-0.0045, -0.1675, 0.294, 0.0775, 0.156, -0.089, 0.213, -0.134, 0.067, 0.189, \ldots]$$
+$$\text{Hidden layer} = [-0.0045, -0.1675, \ldots, 0.156, -0.089, 0.213, -0.134, 0.067, 0.189, \ldots]$$
 (24 values total)
 
 **Step 2: Apply ReLU activation**
@@ -4354,7 +4352,7 @@ These six probabilities now sum to 100% (up to rounding), so you can check the a
 
 **Production note:** In a real 50,000-word model, we'd do the same operation over the full vocabulary. The math is identical. The only thing we're shrinking here is the number of tokens so the example stays human-computable.
 
-The model predicts "is" with highest probability (21.99%)!
+In this toy example, the model predicts "is" with highest probability (73.07%). In a full 50,000-token vocabulary, the exact percentage would usually be lower because probability mass would be spread across many more options, but the ranking idea is the same.
 
 ### Sampling Strategies
 
@@ -4414,15 +4412,15 @@ Original: "is"=4.7, "the"=3.2, "cat"=2.1
 Scaled logits: $[4.7/0.5 = 9.4, 3.2/0.5 = 6.4, 2.1/0.5 = 4.2]$
 
 Calculate exponentials:
-$$e^{9.4} = 12088, \quad e^{6.4} = 665, \quad e^{4.2} = 67$$
+$$e^{9.4} \approx 12088, \quad e^{6.4} \approx 602, \quad e^{4.2} \approx 67$$
 
-Sum = 12,820
+Sum ≈ 12,757
 
 Probabilities:
 ```
-"is":  12088/12820 = 94.3% ← Much more confident!
-"the": 665/12820   = 5.2%
-"cat": 67/12820    = 0.5%
+"is":  12088/12757 = 94.8% ← Much more confident!
+"the":   602/12757 = 4.7%
+"cat":    67/12757 = 0.5%
 ```
 
 **With T=1.5 (high temperature, more creative):**
@@ -4449,27 +4447,27 @@ Set $k = 5$ (only keep top 5 choices)
 
 Original probabilities:
 ```
-"is": 21.99%, "the": 4.91%, "was": 3.21%, "has": 2.87%, "loves": 2.15%
-"and": 1.89%, "with": 1.45%, ... (49,994 more tokens)
+"is": 73.07%, "the": 16.31%, "cat": 5.43%, "love": 4.02%, "pizza": 1.10%
+"I": 0.07%, ... (remaining toy tokens are tiny)
 ```
 
 **Step 1:** Keep only top 5, set others to 0:
 ```
-"is": 21.99%, "the": 4.91%, "was": 3.21%, "has": 2.87%, "loves": 2.15%
+"is": 73.07%, "the": 16.31%, "cat": 5.43%, "love": 4.02%, "pizza": 1.10%
 (All others): 0%
 ```
 
 **Step 2:** Renormalize so they sum to 100%:
 
-Sum = 21.99 + 4.91 + 3.21 + 2.87 + 2.15 = 35.13%
+Sum = 73.07 + 16.31 + 5.43 + 4.02 + 1.10 = 99.93%
 
 New probabilities:
 ```
-"is":    21.99/35.13 = 62.6%
-"the":   4.91/35.13  = 14.0%
-"was":   3.21/35.13  = 9.1%
-"has":   2.87/35.13  = 8.2%
-"loves": 2.15/35.13  = 6.1%
+"is":    73.07/99.93 = 73.1%
+"the":   16.31/99.93 = 16.3%
+"cat":    5.43/99.93 = 5.4%
+"love":   4.02/99.93 = 4.0%
+"pizza":  1.10/99.93 = 1.1%
 ```
 
 Now sample randomly from these 5! This prevents the model from ever picking weird low-probability tokens.
@@ -4480,16 +4478,12 @@ Set $p = 0.9$ (keep tokens that make up 90% of probability mass)
 
 Original probabilities (sorted):
 ```
-"is": 21.99%  → cumulative: 21.99%
-"the": 4.91%  → cumulative: 26.90%
-"was": 3.21%  → cumulative: 30.11%
-"has": 2.87%  → cumulative: 32.98%
-...
-"beautiful": 1.23% → cumulative: 89.45%
-"amazing": 1.01%   → cumulative: 90.46% ← STOP! Exceeded 90%
+"is": 73.07%  → cumulative: 73.07%
+"the": 16.31% → cumulative: 89.38%
+"cat": 5.43%  → cumulative: 94.81% ← STOP! Exceeded 90%
 ```
 
-**Keep all tokens up to and including "amazing"** (let's say that's 47 tokens)
+**Keep all tokens up to and including "cat"** in this toy example. In a real 50,000-token model, top-p usually keeps a much larger set because the probability mass is spread across many more plausible tokens.
 
 Renormalize these 47 tokens to sum to 100%, then sample.
 
@@ -4994,6 +4988,8 @@ W_{\text{new}} &= W - \eta \frac{\hat{m}_1}{\sqrt{\hat{v}_1} + \epsilon} \\
 &= 0.5001
 \end{align}
 ```
+
+**Why do we divide by $(1-\beta_1^t)$ and $(1-\beta_2^t)$?** Because Adam starts both moving averages at zero. That makes the early $m$ and $v$ values artificially too small. The bias-correction terms "warm them up" so the first few optimization steps aren't misleadingly tiny.
 
 **Why Adam?**
 - Adapts learning rate per parameter
@@ -6004,7 +6000,7 @@ You want to build a medical diagnosis chatbot. A beginner might think:
 2. **Fine-tuning**: Adapt to specific tasks (medical chatbot) - costs $1,000
 3. **Instruction tuning/RLHF**: Make it helpful and safe - costs $50,000
 
-**This three-stage process is how ChatGPT, Claude, and all modern AI assistants are made!**
+**This three-stage process is a useful mental model for how systems like ChatGPT are built, and it captures a big part of the story for many modern assistants.** But as we'll note later, real production pipelines can add extra alignment and post-training techniques on top of these core stages.
 
 Let's understand each stage so you know what's actually happening in the real world.
 
@@ -7170,7 +7166,7 @@ You started this journey knowing transformers were "some AI thing." Now you unde
 
 ## Final Thoughts
 
-Every response you get from ChatGPT or Claude flows through exactly these steps—just with bigger numbers:
+Every response you get from systems like ChatGPT or Claude relies on these same core ideas—just with bigger models, more engineering, and a few modern variations:
 
 ### Our Tutorial vs ChatGPT: The Scale Comparison
 
@@ -7181,12 +7177,12 @@ Every response you get from ChatGPT or Claude flows through exactly these steps�
 | Layers | 3 | 96 | 32× deeper |
 | Vocabulary | 50,000 | 50,257 | Similar! |
 | FFN dimension | 24 | 49,152 | 2,048× larger |
-| Total parameters | ~5,000 | 175 billion | 35 million× more! |
+| Total parameters | ~300,000+ | 175 billion | ~580,000× more |
 | Training data | Toy examples | 300B tokens | — |
 | Training time | Seconds | Months | — |
 | Training cost | $0 | ~$10 million | — |
 
-**But the core algorithm? Identical to what you just learned by hand!**
+**But the core ideas? The same ones you just learned by hand.** Modern systems add engineering improvements and a few architectural refinements, but the foundation is the same.
 
 ### What Scales, What Doesn't
 
